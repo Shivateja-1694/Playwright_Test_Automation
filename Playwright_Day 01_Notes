@@ -1,0 +1,480 @@
+--------------------------------
+DAY 01 08/12 - WEDNESDAY
+--------------------------------
+Playwright Documentation
+https://devdocs.io/playwright/actionability
+
+Why Playwright?
+
+Playwright is an open-source automation framework developed by Microsoft for web/UI automation and end-to-end testing.
+
+Basic Features
+
+1. Built-in Auto-Waiting Capability
+		Playwright automatically waits for elements to become ready before performing actions.
+		This reduces the need to write explicit waits such as fixed sleep statements.
+2. Built-in Actionability Checks
+		Before performing an action, Playwright automatically checks whether the element is:
+			Visible
+			Stable
+			Able to receive the required event
+			Enabled
+			Editable, when applicable
+		This helps make tests more reliable.
+3. Cross-Browser Support
+		Playwright supports the major browser engines:
+			Chromium
+			Firefox
+			WebKit
+	Chromium-based browsers include Chrome and Microsoft Edge.
+4. Multi-Platform Support
+		Playwright can be used on:
+			Windows
+			macOS
+			Linux
+5. Multi-Language Support
+		Playwright provides support for:
+			JavaScript
+			TypeScript
+			Python
+			Java
+			C# / .NET
+			
+Advanced Features
+
+1. Tracing and Debugging
+		Playwright provides a powerful tracing mechanism for debugging tests.
+		Trace information can include:
+			Screenshots
+			DOM snapshots
+			Network activity
+			Test actions
+			Console information
+		Playwright also supports video recording when configured.
+2. Network Interception
+		Playwright can intercept and modify network requests and responses.
+		We can mock API responses and provide static/test data.
+		This is useful when testing UI behavior without depending on the actual backend API.
+3. Browser Context Management
+		Playwright uses isolated browser contexts.
+		Each context behaves like a separate browser session.
+		We can save and reuse authentication/storage state such as cookies and local storage.
+		This is useful for avoiding repeated login steps.
+4. Codegen Tool
+		Playwright Codegen can record actions performed in the browser and generate corresponding Playwright code.
+		It can be useful for quickly creating an initial test script.
+
+Course Structure and Approach
+
+1. JavaScript / TypeScript Focus
+		Focus on JavaScript and TypeScript for building Playwright automation.
+		Understand the JavaScript fundamentals required for Playwright.
+		Learn how JavaScript code can be written and converted/structured using TypeScript.
+2. Comprehensive Coverage
+The course covers:
+
+	Web/UI automation
+	API testing
+	Advanced Playwright features
+	Test framework concepts
+3. Beginner-Friendly Approach
+		Concepts are explained from the basics.
+		Practical examples are used to understand the concepts.
+4. Practical and Hands-On
+		Write actual Playwright tests.
+		Execute tests.
+		Debug failures.
+		Understand the generated reports and test results.
+
+
+Note for Windows PowerShell Users.
+In the next chapter, while executing npm init playwright, you might see an error in powershell.
+
+
+Playwright Installation and Setup
+
+What is Node.js?
+
+Node.js is an open-source, cross-platform JavaScript runtime environment.
+It allows JavaScript code to run outside of a web browser.
+Playwright uses Node.js to execute the Playwright test scripts and manage the test automation environment.
+
+Installation of node.js and adding it in env variable
+Installation of VS Code
+
+Install Playwright Dependencies
+Command - npm init playwright
+
+Installation
+Install Node.js
+
+Install Node.js and make sure it is available in the system environment.
+
+Verify the installation using
+node --version
+npm --version
+
+Here's how you can fix it:
+
+Here are the steps to fix the issue persistently:
+ 
+1.  **Open PowerShell as Administrator**:
+    *   Search for "PowerShell" in the Start menu.
+    *   Right-click it.
+    *   Select **Run as Administrator**.
+ 
+2.  **Check Current Execution Policy**:
+    *   Run this command in PowerShell:
+        `Get-ExecutionPolicy -List`
+    *   This shows policies for different scopes.
+ 
+3.  **Set Persistent Execution Policy**:
+    *   To allow scripts for your user account persistently:
+        `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass`
+    *   This setting applies only to your user account.
+    *   It remains active after you restart your computer.
+    *   Answer 'Y' (Yes) if prompted to confirm the change.
+ 
+    *   Alternatively, to allow scripts for all users persistently (requires administrator privileges):
+        `Set-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy Bypass`
+    *   This setting applies to all users on the computer.
+    *   It remains active after restarts.
+    *   Answer 'Y' (Yes) if prompted.
+    *   Choose the scope (`CurrentUser` or `LocalMachine`) that best fits your needs. `CurrentUser` is often sufficient and safer.
+ 
+4.  **Run Your Command Again**:
+    *   Retry your `npm init playwright` command.
+    *   It should run without the execution policy error.
+ 
+**Additional Notes**:
+ 
+*   Using `Bypass` lets any script run. Understand the security risk before proceeding.
+*   If problems continue, consider reinstalling Node.js. Get the latest version from the Node.js website.
+
+--------------------------------
+DAY 02 08/13 - THURSDAY
+--------------------------------
+Steps to Install Playwright Dependencies
+
+1. Open VS Code and Create new Project Folder [Empty] and Open it
+2. Open Terminal and type npm init  playwright for creating the playwright project structure inside the folder
+3. Select Javascript in terminal
+
+---------------------------------------------------
+
+const {test} = require('@playwright/test');
+
+1. What is @playwright/test?
+
+@playwright/test is the Playwright Test package.
+
+When you install Playwright, this package provides things you need to write and run tests, such as:
+
+test → used to define a test
+expect → used to verify/assert results
+Playwright's test fixtures such as page, browser, etc.
+
+Think of it as:
+
+"Give me the tools provided by Playwright's testing framework."
+
+2. What does require() mean?
+
+require('@playwright/test')
+
+require() is a Node.js function used to import/load something from another module/package.
+
+For example: const calculator = require('./calculator');
+means: "Load the calculator module so I can use it in this file."
+
+So: require('@playwright/test')
+means: "Load the Playwright Test package so I can use its functionality."
+---------------------------------------------------
+npm install --save-dev @types/node - CommonJS 
+CommonJS is a module system commonly used in Node.js.
+
+import {test} from '@playwright/test'; - ES Module / TypeScript Style
+In modern TypeScript Playwright projects, we commonly use the import syntax:
+This is the ES Module (ESM) syntax and is commonly used in TypeScript projects.
+---------------------------------------------------
+
+Playwright Test Case Template — TypeScript
+
+import { test } from '@playwright/test';
+
+test('First Playwright test', async () => {
+
+    // Playwright Code
+    // Step 1
+    // Step 2
+    // Step 3
+
+});
+
+test() - is a function provided by Playwright. It is used to define a test case.
+async - is a JavaScript keyword.
+
+What is async?
+
+async is a JavaScript keyword used to define an asynchronous function.
+It tells JavaScript:
+This function can perform asynchronous operations and can use await inside it.
+
+What is await?
+
+await is a JavaScript keyword used inside an async function.
+It means:
+Wait for the asynchronous operation to complete before continuing to the next line.
+
+async and await — Easy Way to Remember
+
+async
+  ↓
+Allows the function to use await
+
+await
+  ↓
+Wait for a specific asynchronous operation to complete
+---------------------------------------------------
+
+Playwright Fixtures
+What are Fixtures?
+
+Fixtures are predefined objects provided by the Playwright Test
+framework that help us set up and use the resources required by our tests.
+
+Common Playwright fixtures include:
+
+	page
+	browser
+	context
+	request
+
+Fixtures are provided to the test through the function parameters, using { }.
+
+Note: Fixtures are not exactly "global variables." 
+They are values/objects that Playwright Test provides to the test function when the test runs. 
+They are managed by Playwright according to the fixture's lifecycle.
+---------------------------------------------------
+How are Fixtures Declared?
+
+Fixtures are received inside { } in the test function:
+
+test('First Playwright test', async ({ browser }) => {
+});
+
+Here:
+{ browser }
+is the browser fixture provided by Playwright.
+
+Another example:
+test('Page Test', async ({ page }) => {
+});
+
+Here:
+{ page }
+is the page fixture provided by Playwright.
+---------------------------------------------------
+Common Playwright Fixtures
+
+1. browser
+
+Represents the browser instance.
+
+test('Browser Test', async ({ browser }) => {
+    const context = await browser.newContext();
+});
+
+2. context
+
+Represents an isolated browser session.
+
+test('Context Test', async ({ context }) => {
+    const page = await context.newPage();
+});
+
+3. page
+
+Represents a browser tab/page.
+
+test('Page Test', async ({ page }) => {
+    await page.goto('https://example.com');
+});
+
+The page fixture is commonly used for normal UI automation.
+
+4. request
+
+Used for making API requests.
+
+test('API Test', async ({ request }) => {
+    const response = await request.get('https://example.com/api/users');
+});
+---------------------------------------------------
+Browser, Browser Context and Page in Playwright
+
+Browser Fixture
+
+browser is a Playwright fixture that represents the browser instance.
+
+test('Browser Context Playwright test', async ({ browser }) => {
+    // Test steps
+});
+
+Here, Playwright provides the browser object to the test.
+---------------------------------------------------
+const and let in JavaScript/TypeScript
+
+In JavaScript, const and let are used to declare variables.
+
+const
+
+Use const when the variable should not be reassigned.
+
+const context = await browser.newContext();
+const page = await context.newPage();
+
+Here, context and page cannot be reassigned to another value later.
+
+For example:
+
+const page = await context.newPage();
+page = anotherPage; // ❌ Not allowed
+---------------------------------------------------
+let
+
+Use let when the variable needs to be reassigned.
+
+let page = await context.newPage();
+page = anotherPage; // ✅ Allowed
+
+Important Correction
+
+Instead of writing:
+
+"In JS, the return type of the variable is Let/Const"
+
+write:
+
+let and const are JavaScript keywords used to declare variables. They are not return types.
+
+Example: const page = await context.newPage();
+
+---------------------------------------------------
+Browser Context
+
+A Browser Context represents an isolated browser session.
+
+We can create a new browser context using:
+const context = await browser.newContext();
+
+A Browser Context can have its own:
+
+Cookies
+Local Storage
+Session Storage
+Authentication state
+Browser settings
+
+Think of it as a separate browser session inside the same browser.
+
+Browser Context Structure
+Browser
+   │
+   ├── Context 1
+   │      └── Page
+   │
+   ├── Context 2
+   │      └── Page
+   │
+   └── Context 3
+          └── Page
+		  
+Each context is isolated from the others.
+---------------------------------------------------
+Page
+
+A Page represents a browser tab/page.
+
+We can create a page inside a browser context using:
+
+const page = await context.newPage();
+
+Once we have the page, we can interact with the website.
+
+await page.goto('https://example.com');
+---------------------------------------------------
+Browser → Context → Page
+
+The basic hierarchy is:
+
+Browser
+   ↓
+Browser Context
+   ↓
+Page
+   ↓
+Web Elements
+---------------------------------------------------
+const context = await browser.newContext();
+const page = await context.newPage();
+
+await page.goto('https://example.com');
+---------------------------------------------------
+Execution flow:
+
+browser
+   ↓
+newContext()
+   ↓
+context
+   ↓
+newPage()
+   ↓
+page
+   ↓
+goto()
+   ↓
+Website opens
+---------------------------------------------------
+Page Fixture
+
+Playwright Test can automatically provide a page fixture to the test.
+
+Instead of manually creating:
+
+const context = await browser.newContext();
+const page = await context.newPage();
+
+we can directly use:
+
+test('Page Playwright test', async ({ page }) => {
+    await page.goto('https://example.com');
+});
+
+Playwright handles the required browser context and page setup for us.
+---------------------------------------------------
+Browser Context vs Page Fixture
+
+Using browser
+
+test('Browser Context Playwright test', async ({ browser }) => {
+
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    await page.goto('https://example.com');
+
+});
+
+Here, we manually create the Browser Context and Page.
+---------------------------------------------------
+Using page
+
+test('Page Playwright test', async ({ page }) => {
+
+    await page.goto('https://example.com');
+
+});
+
+Here, Playwright automatically provides the Page fixture.
