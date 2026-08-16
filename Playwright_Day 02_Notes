@@ -1,51 +1,136 @@
 --------------------------------
 DAY 02 08/13 - THURSDAY
 --------------------------------
+
+PLAYWRIGHT INSTALLATION AND SETUP
+
 Steps to Install Playwright Dependencies
 
-1. Open VS Code and Create new Project Folder [Empty] and Open it
-2. Open Terminal and type npm init  playwright for creating the playwright project structure inside the folder
-3. Select Javascript in terminal
+1. Open VS Code.
+2. Create a new empty project folder and open it in VS Code.
+3. Open the VS Code Terminal.
+4. Run the following command:
 
----------------------------------------------------
+npm init playwright
 
-const {test} = require('@playwright/test');
+5. Follow the prompts in the terminal.
+6. Select JavaScript as the language.
+
+--------------------------------
+PLAYWRIGHT TEST PACKAGE
+--------------------------------
+
+Example:
+
+const { test } = require('@playwright/test');
 
 1. What is @playwright/test?
 
 @playwright/test is the Playwright Test package.
 
-When you install Playwright, this package provides things you need to write and run tests, such as:
+It provides the tools required to create and execute Playwright tests.
 
-test → used to define a test
-expect → used to verify/assert results
-Playwright's test fixtures such as page, browser, etc.
+It provides features such as:
 
-Think of it as:
+test
+    → Used to define a test case.
 
-"Give me the tools provided by Playwright's testing framework."
+expect
+    → Used to verify/assert expected results.
 
+Fixtures
+    → Provides objects such as page, browser, context, request, etc.
+
+Easy way to remember:
+
+@playwright/test
+        ↓
+Provides the tools required to write and run Playwright tests.
+
+--------------------------------
 2. What does require() mean?
+--------------------------------
 
-require('@playwright/test')
+require() is a Node.js/CommonJS function used to import or load a module or package.
 
-require() is a Node.js function used to import/load something from another module/package.
+Example:
 
-For example: const calculator = require('./calculator');
-means: "Load the calculator module so I can use it in this file."
+const calculator = require('./calculator');
 
-So: require('@playwright/test')
-means: "Load the Playwright Test package so I can use its functionality."
----------------------------------------------------
-npm install --save-dev @types/node - CommonJS 
+This means:
+
+"Load the calculator module so that I can use it in this file."
+
+Similarly:
+
+const { test } = require('@playwright/test');
+
+means:
+
+"Load the Playwright Test package so that I can use its functionality."
+
+--------------------------------
+COMMONJS vs ES MODULE / TYPESCRIPT
+--------------------------------
+
+There are two commonly seen module styles:
+
+1. CommonJS
+2. ES Module (ESM)
+
+
+1. CommonJS
+
 CommonJS is a module system commonly used in Node.js.
 
-import {test} from '@playwright/test'; - ES Module / TypeScript Style
-In modern TypeScript Playwright projects, we commonly use the import syntax:
-This is the ES Module (ESM) syntax and is commonly used in TypeScript projects.
----------------------------------------------------
+Example:
 
-Playwright Test Case Template — TypeScript
+const { test } = require('@playwright/test');
+
+CommonJS uses:
+
+require()
+    → Import/load a module
+
+module.exports
+    → Export a module
+
+
+2. ES Module / TypeScript Style
+
+Modern TypeScript Playwright projects commonly use the ES Module syntax.
+
+Example:
+
+import { test } from '@playwright/test';
+
+ES Module uses:
+
+import
+    → Import a module
+
+export / export default
+    → Export a module
+
+
+IMPORTANT:
+
+Do not confuse:
+
+npm install --save-dev @types/node
+
+with CommonJS.
+
+@types/node provides TypeScript type definitions for Node.js APIs.
+It is not what makes a project CommonJS.
+
+CommonJS is determined by the project's module configuration and the syntax being used, such as require() and module.exports.
+
+--------------------------------
+PLAYWRIGHT TEST CASE TEMPLATE — TYPESCRIPT
+--------------------------------
+
+Example:
 
 import { test } from '@playwright/test';
 
@@ -58,174 +143,236 @@ test('First Playwright test', async () => {
 
 });
 
-test() - is a function provided by Playwright. It is used to define a test case.
-async - is a JavaScript keyword.
 
-What is async?
+test()
+    → A function provided by Playwright.
+    → Used to define a test case.
 
-async is a JavaScript keyword used to define an asynchronous function.
-It tells JavaScript:
-This function can perform asynchronous operations and can use await inside it.
-
-What is await?
-
-await is a JavaScript keyword used inside an async function.
-It means:
-Wait for the asynchronous operation to complete before continuing to the next line.
-
-async and await — Easy Way to Remember
 
 async
-  ↓
+    → A JavaScript keyword used to define an asynchronous function.
+    → It allows the function to use await.
+	
+--------------------------------
+WHAT IS async?
+--------------------------------
+
+async is a JavaScript keyword used to define an asynchronous function.
+
+It tells JavaScript:
+
+"This function can perform asynchronous operations and can use await inside it."
+
+
+Example:
+
+test('First Playwright test', async () => {
+
+});
+
+
+Here:
+
+async
+    ↓
 Allows the function to use await
 
-await
-  ↓
-Wait for a specific asynchronous operation to complete
----------------------------------------------------
 
-Playwright Fixtures
-What are Fixtures?
+--------------------------------
+WHAT IS await?
+--------------------------------
 
-Fixtures are predefined objects provided by the Playwright Test
-framework that help us set up and use the resources required by our tests.
+await is a JavaScript keyword used inside an async function.
+
+It means:
+
+"Wait for the asynchronous operation to complete before continuing to the next line."
+
+Example:
+
+await page.goto('https://example.com');
+
+The next statement will execute after the navigation operation has completed.
+
+--------------------------------
+PLAYWRIGHT FIXTURES
+--------------------------------
+
+1. What are Fixtures?
+
+Fixtures are predefined objects provided by the Playwright Test framework.
+
+They help us set up and use the resources required by our tests.
 
 Common Playwright fixtures include:
 
-	page
-	browser
-	context
-	request
+page
+browser
+context
+request
 
-Fixtures are provided to the test through the function parameters, using { }.
 
-Note: Fixtures are not exactly "global variables." 
-They are values/objects that Playwright Test provides to the test function when the test runs. 
-They are managed by Playwright according to the fixture's lifecycle.
----------------------------------------------------
-How are Fixtures Declared?
+Fixtures are provided to the test through the function parameters using { }.
 
-Fixtures are received inside { } in the test function:
+Example:
 
 test('First Playwright test', async ({ browser }) => {
+
 });
 
+
 Here:
+
 { browser }
-is the browser fixture provided by Playwright.
+    ↓
+browser is a Playwright fixture provided by Playwright.
+
+
+IMPORTANT:
+
+Fixtures are not exactly "global variables."
+
+They are values/objects that Playwright Test provides to the test function when the test runs.
+
+Playwright also manages the fixture's setup and lifecycle.
+
+
+--------------------------------
+HOW ARE FIXTURES DECLARED?
+--------------------------------
+
+Fixtures are received inside { } in the test function.
+
+Example:
+
+test('Browser Test', async ({ browser }) => {
+
+});
+
+
+Here:
+
+{ browser }
+    ↓
+Receives the browser fixture from Playwright.
+
 
 Another example:
+
 test('Page Test', async ({ page }) => {
+
 });
 
+
 Here:
+
 { page }
-is the page fixture provided by Playwright.
----------------------------------------------------
-Common Playwright Fixtures
+    ↓
+Receives the page fixture from Playwright.
+
+
+--------------------------------
+COMMON PLAYWRIGHT FIXTURES
+--------------------------------
 
 1. browser
 
 Represents the browser instance.
 
+Example:
+
 test('Browser Test', async ({ browser }) => {
+
     const context = await browser.newContext();
+
 });
+
 
 2. context
 
 Represents an isolated browser session.
 
+Example:
+
 test('Context Test', async ({ context }) => {
+
     const page = await context.newPage();
+
 });
+
 
 3. page
 
 Represents a browser tab/page.
 
+Example:
+
 test('Page Test', async ({ page }) => {
+
     await page.goto('https://example.com');
+
 });
 
+
 The page fixture is commonly used for normal UI automation.
+
 
 4. request
 
 Used for making API requests.
 
+Example:
+
 test('API Test', async ({ request }) => {
+
     const response = await request.get('https://example.com/api/users');
-});
----------------------------------------------------
-Browser, Browser Context and Page in Playwright
 
-Browser Fixture
-
-browser is a Playwright fixture that represents the browser instance.
-
-test('Browser Context Playwright test', async ({ browser }) => {
-    // Test steps
 });
 
-Here, Playwright provides the browser object to the test.
----------------------------------------------------
-const and let in JavaScript/TypeScript
 
-In JavaScript, const and let are used to declare variables.
+--------------------------------
+BROWSER, BROWSER CONTEXT AND PAGE
+--------------------------------
 
-const
+1. Browser
 
-Use const when the variable should not be reassigned.
+The browser represents the browser instance.
 
-const context = await browser.newContext();
-const page = await context.newPage();
+Example:
 
-Here, context and page cannot be reassigned to another value later.
+test('Browser Test', async ({ browser }) => {
 
-For example:
+});
 
-const page = await context.newPage();
-page = anotherPage; // ❌ Not allowed
----------------------------------------------------
-let
 
-Use let when the variable needs to be reassigned.
+Here, Playwright provides the browser fixture to the test.
 
-let page = await context.newPage();
-page = anotherPage; // ✅ Allowed
 
-Important Correction
-
-Instead of writing:
-
-"In JS, the return type of the variable is Let/Const"
-
-write:
-
-let and const are JavaScript keywords used to declare variables. They are not return types.
-
-Example: const page = await context.newPage();
-
----------------------------------------------------
-Browser Context
+2. Browser Context
 
 A Browser Context represents an isolated browser session.
 
 We can create a new browser context using:
+
 const context = await browser.newContext();
+
 
 A Browser Context can have its own:
 
-Cookies
-Local Storage
-Session Storage
-Authentication state
-Browser settings
+- Cookies
+- Local Storage
+- Session Storage
+- Authentication state
+- Browser settings
 
-Think of it as a separate browser session inside the same browser.
 
-Browser Context Structure
+Think of a Browser Context as:
+
+"A separate and isolated browser session inside the same browser."
+
+
+Browser Context Structure:
+
 Browser
    │
    ├── Context 1
@@ -236,24 +383,34 @@ Browser
    │
    └── Context 3
           └── Page
-		  
-Each context is isolated from the others.
----------------------------------------------------
-Page
 
-A Page represents a browser tab/page.
+
+Each context is isolated from the others.
+
+
+--------------------------------
+3. PAGE
+--------------------------------
+
+A Page represents a browser tab.
 
 We can create a page inside a browser context using:
 
 const page = await context.newPage();
 
+
 Once we have the page, we can interact with the website.
 
-await page.goto('https://example.com');
----------------------------------------------------
-Browser → Context → Page
+Example:
 
-The basic hierarchy is:
+await page.goto('https://example.com');
+
+
+--------------------------------
+BROWSER → CONTEXT → PAGE
+--------------------------------
+
+The basic Playwright hierarchy is:
 
 Browser
    ↓
@@ -262,12 +419,17 @@ Browser Context
 Page
    ↓
 Web Elements
----------------------------------------------------
+
+
+Example:
+
 const context = await browser.newContext();
+
 const page = await context.newPage();
 
 await page.goto('https://example.com');
----------------------------------------------------
+
+
 Execution flow:
 
 browser
@@ -283,40 +445,122 @@ page
 goto()
    ↓
 Website opens
----------------------------------------------------
-Page Fixture
+
+
+--------------------------------
+const AND let IN JAVASCRIPT/TYPESCRIPT
+--------------------------------
+
+In JavaScript/TypeScript, const and let are keywords used to declare variables.
+
+They are NOT return types.
+
+
+1. const
+
+Use const when the variable should not be reassigned.
+
+Example:
+
+const context = await browser.newContext();
+
+const page = await context.newPage();
+
+
+Here:
+
+context and page cannot be reassigned to another value later.
+
+
+Example:
+
+const page = await context.newPage();
+
+page = anotherPage;    // ❌ Not allowed
+
+
+2. let
+
+Use let when the variable needs to be reassigned.
+
+Example:
+
+let page = await context.newPage();
+
+page = anotherPage;    // ✅ Allowed
+
+
+IMPORTANT:
+
+Instead of saying:
+
+"In JavaScript, the return type of the variable is let/const."
+
+Say:
+
+"let and const are JavaScript keywords used to declare variables. They are not return types."
+
+
+--------------------------------
+PAGE FIXTURE
+--------------------------------
 
 Playwright Test can automatically provide a page fixture to the test.
 
 Instead of manually creating:
 
 const context = await browser.newContext();
+
 const page = await context.newPage();
 
-we can directly use:
+
+We can directly use the page fixture:
 
 test('Page Playwright test', async ({ page }) => {
+
     await page.goto('https://example.com');
+
 });
 
-Playwright handles the required browser context and page setup for us.
----------------------------------------------------
-Browser Context vs Page Fixture
 
-Using browser
+Here, Playwright automatically provides the page fixture and manages the required setup.
+
+
+--------------------------------
+BROWSER CONTEXT vs PAGE FIXTURE
+--------------------------------
+
+1. Using browser fixture
+
+Example:
 
 test('Browser Context Playwright test', async ({ browser }) => {
 
     const context = await browser.newContext();
+
     const page = await context.newPage();
 
     await page.goto('https://example.com');
 
 });
 
-Here, we manually create the Browser Context and Page.
----------------------------------------------------
-Using page
+
+Here:
+
+browser
+    ↓
+We manually create the Browser Context
+    ↓
+context
+    ↓
+We manually create the Page
+    ↓
+page
+
+
+2. Using page fixture
+
+Example:
 
 test('Page Playwright test', async ({ page }) => {
 
@@ -324,4 +568,60 @@ test('Page Playwright test', async ({ page }) => {
 
 });
 
-Here, Playwright automatically provides the Page fixture.
+
+Here:
+
+page
+    ↓
+Playwright provides the Page fixture
+    ↓
+We can directly interact with the website
+
+
+--------------------------------
+EASY WAY TO REMEMBER
+--------------------------------
+
+Browser
+    ↓
+Browser instance
+
+Browser Context
+    ↓
+Isolated browser session
+
+Page
+    ↓
+Browser tab
+
+Web Elements
+    ↓
+Elements inside the page
+
+
+Basic hierarchy:
+
+Browser
+   ↓
+Context
+   ↓
+Page
+   ↓
+Web Elements
+
+
+For normal UI automation:
+
+{ page }
+    ↓
+Usually enough
+
+
+When more control over browser sessions is required:
+
+{ browser }
+    ↓
+Create/manage Browser Context
+    ↓
+Create/manage Page
+
