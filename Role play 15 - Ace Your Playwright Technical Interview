@@ -1,0 +1,40 @@
+1. Advantages of Playwright
+
+Answer:
+
+Playwright has several advantages. 
+
+-- First, it has built-in auto-waiting, so it automatically waits for elements to become ready before performing actions, 
+which makes tests more reliable. 
+-- Second, it supports multiple browser engines such as Chromium, Firefox, and WebKit, so we can perform cross-browser testing. 
+-- It also supports multiple programming languages like JavaScript, TypeScript, Java, Python, and C#.
+
+2. Browser, Browser Context, and Page
+
+Answer:
+
+In Playwright, the Browser represents the browser instance. 
+Inside the Browser, we can create a Browser Context, which represents an isolated browser session. 
+Inside the Browser Context, we can create a Page, which represents a browser tab. 
+So the basic hierarchy is Browser → Browser Context → Page → Web Elements.
+
+3. Codegen / Network Interception
+
+Answer — Codegen:
+
+Playwright Codegen is a tool that can record our actions on a website and automatically generate Playwright test code. 
+It is useful for quickly creating a basic test script and identifying locators.
+
+Answer — Network Interception:
+
+Playwright provides network interception, which allows us to monitor, modify, or mock network requests and responses. 
+It is useful when we want to test an application with controlled or static API data.
+
+4. Debugging Features
+
+Answer:
+
+Playwright provides built-in debugging features such as tracing, screenshots, and video recording. 
+For example, 
+tracing captures detailed information about the test execution, which helps us understand where and why a test failed. 
+Screenshots and videos can also help us visually identify the failure.

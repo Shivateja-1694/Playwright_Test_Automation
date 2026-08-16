@@ -1,0 +1,964 @@
+--------------------------------
+DAY 03 — 08/16 — SUNDAY
+--------------------------------
+
+------------------------
+PLAYWRIGHT CONFIGURATION
+------------------------
+
+Playwright provides a configuration file called:
+
+playwright.config.ts
+
+This file is used to configure different settings for the Playwright test framework.
+
+Some commonly used configurations are:
+
+1. testDir
+2. timeout
+3. expect
+4. reporter
+5. use
+6. browserName
+
+------------------------
+1. TEST DIRECTORY — testDir
+------------------------
+
+testDir is used to specify the location of the test files.
+
+Example:
+
+testDir: './tests'
+
+This means Playwright will look for test files inside the "tests" folder.
+
+------------------------
+2. TEST TIMEOUT — timeout
+------------------------
+
+By default, Playwright provides a 30-second timeout for each test.
+
+If a test does not complete within the configured timeout, Playwright will fail the test because of a timeout.
+
+To change the default test timeout, use:
+
+timeout: 40 * 1000
+
+Example:
+
+export default defineConfig({
+    testDir: './tests',
+    timeout: 40 * 1000,
+
+    use: {
+    },
+});
+
+
+Explanation:
+
+40 * 1000
+
+40 seconds × 1000 milliseconds
+= 40,000 milliseconds
+
+Therefore:
+
+timeout: 40 * 1000
+
+is equivalent to:
+
+timeout: 40000
+
+
+Important:
+
+The top-level "timeout" represents the maximum time allowed for the entire test.
+
+It does NOT mean that every individual step gets a separate 40-second timeout.
+
+Example:
+
+Test
+ |
+ ├── Step 1
+ ├── Step 2
+ ├── Step 3
+ └── Step 4
+
+The total test execution time must be within the configured test timeout.
+
+------------------------
+3. EXPECT TIMEOUT
+------------------------
+
+Playwright has a separate timeout for assertions using "expect()".
+
+By default, Playwright waits for a limited amount of time for an assertion to pass.
+
+We can customize the assertion timeout using:
+
+expect: {
+    timeout: 40 * 1000,
+}
+
+Example:
+
+export default defineConfig({
+    testDir: './tests',
+
+    timeout: 40 * 1000,
+
+    expect: {
+        timeout: 40 * 1000,
+    },
+
+    use: {
+    },
+});
+
+
+Difference between "timeout" and "expect.timeout":
+
+timeout
+    ↓
+Maximum time allowed for the entire test
+
+expect.timeout
+    ↓
+Maximum time Playwright waits for an expect() assertion
+
+
+Example:
+
+test('Login Test', async ({ page }) => {
+
+    await page.goto('https://example.com');
+
+    await expect(page.locator('#username')).toBeVisible();
+
+});
+
+
+Here:
+
+await page.goto(...)
+    ↓
+Navigation/action operation
+
+await expect(...)
+    ↓
+Assertion
+
+The assertion timeout is controlled by:
+
+expect: {
+    timeout: 40 * 1000,
+}
+
+------------------------
+4. BROWSER NAME — browserName
+------------------------
+
+The "browserName" property is used to specify which browser engine Playwright should use.
+
+Example:
+
+use: {
+    browserName: 'chromium',
+}
+
+
+Available browser engines:
+
+1. Chromium
+
+browserName: 'chromium'
+
+Used for the Chromium browser engine.
+
+2. Firefox
+
+browserName: 'firefox'
+
+Used for the Firefox browser engine.
+
+3. WebKit
+
+browserName: 'webkit'
+
+Used for the WebKit browser engine.
+
+
+Example:
+
+use: {
+    browserName: 'chromium',
+}
+
+
+Important:
+
+"chromium" refers to the Chromium browser engine.
+
+It does not specifically mean Google Chrome.
+
+To run specifically on Google Chrome or Microsoft Edge, Playwright provides browser channels such as:
+
+channel: 'chrome'
+
+channel: 'msedge'
+
+------------------------
+5. REPORTER
+------------------------
+
+A reporter controls how Playwright displays and generates test results.
+
+The reporter is configured using:
+
+reporter
+
+Example:
+
+reporter: 'html'
+
+
+Common Playwright reporters:
+
+1. list
+
+reporter: 'list'
+
+Displays detailed test results in the terminal.
+
+Example:
+
+  ✓  1 tests\UIBasicstest.spec.ts:3:5 › Browser Context Playwright test (4.6s)
+  ✓  2 tests\example.spec.js:4:5 › has title (1.7s)
+  ✓  3 tests\example.spec.js:11:5 › get started link (1.7s)
+  ✓  4 tests\UIBasicstest.spec.ts:11:5 › Page Playwright test (3.7s)
+
+
+2. line
+
+reporter: 'line'
+
+Displays test results in a compact format.
+
+Example:
+
+[4/4] tests\UIBasicstest.spec.ts:11:5 › Page Playwright test
+
+
+3. dot
+
+reporter: 'dot'
+
+Displays a dot for each test.
+
+Example:
+
+····
+
+4. html
+
+reporter: 'html'
+
+Generates an HTML test report.
+
+The HTML report can be opened in a browser.
+
+
+To open the HTML report:
+
+npx playwright show-report
+
+------------------------
+RECOMMENDED CONFIGURATION
+------------------------
+
+For the current Playwright project:
+
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+
+    // Location of test files
+    testDir: './tests',
+
+    // Maximum time allowed for each test
+    timeout: 40 * 1000,
+
+    // Maximum time to wait for assertions
+    expect: {
+        timeout: 40 * 1000,
+    },
+
+    // Test report
+    reporter: 'html',
+
+    // Browser and other test settings
+    use: {
+        browserName: 'chromium',
+    },
+
+});
+
+------------------------
+CONFIGURATION STRUCTURE
+------------------------
+
+defineConfig
+    |
+    ├── testDir
+    |      ↓
+    |   Test file location
+    |
+    ├── timeout
+    |      ↓
+    |   Maximum time for each test
+    |
+    ├── expect
+    |      ↓
+    |   Assertion timeout
+    |
+    ├── reporter
+    |      ↓
+    |   Test result/report format
+    |
+    └── use
+           ↓
+       Browser and other test settings
+
+------------------------
+IMPORTANT COMMANDS
+------------------------
+
+Run Playwright tests:
+
+npx playwright test
+
+
+Open HTML report:
+
+npx playwright show-report
+
+
+EASY WAY TO REMEMBER
+
+testDir
+    → Where are my tests?
+
+timeout
+    → How long can the entire test run?
+
+expect.timeout
+    → How long should an assertion wait?
+
+browserName
+    → Which browser engine should I use?
+
+reporter
+    → How should I see my test results?
+
+use
+    → What browser/test settings should I use?
+
+------------------------	
+WHAT IS defineConfig()?
+------------------------
+
+defineConfig() is a function provided by the Playwright Test package.
+
+It is used to define and configure the settings for a Playwright test project.
+
+Import:
+
+import { defineConfig } from '@playwright/test';
+
+
+Example:
+
+export default defineConfig({
+    testDir: './tests',
+    timeout: 40 * 1000,
+
+    expect: {
+        timeout: 40 * 1000,
+    },
+
+    reporter: 'html',
+
+    use: {
+        browserName: 'chromium',
+    },
+});
+
+------------------------
+WHY DO WE USE defineConfig()?
+------------------------
+
+Playwright needs different configuration settings such as:
+
+1. Test file location
+2. Test timeout
+3. Assertion timeout
+4. Browser
+5. Reporter
+6. Screenshots
+7. Videos
+8. Traces
+9. Other test settings
+
+defineConfig() is used to define these settings in one Playwright configuration.
+
+SYNTAX:
+
+defineConfig({
+    configuration properties
+});
+
+Example:
+
+defineConfig({
+    testDir: './tests',
+    timeout: 40 * 1000,
+});
+
+
+Here:
+
+defineConfig()
+    → Playwright configuration function
+
+{ }
+    → Configuration object
+
+testDir
+    → Configuration property
+
+'./tests'
+    → Value of the property
+
+------------------------
+COMMON CONFIGURATION PROPERTIES:
+------------------------
+
+testDir
+    → Specifies where the test files are located.
+
+timeout
+    → Specifies the maximum time allowed for each test.
+
+expect
+    → Configures assertion-related settings.
+
+reporter
+    → Specifies how test results should be reported.
+
+use
+    → Contains browser and other test execution settings.
+
+
+export default defineConfig()
+
+export default is used to export the Playwright configuration as the default export from the configuration file.
+
+Example:
+
+export default defineConfig({
+    testDir: './tests',
+});
+
+
+EASY WAY TO REMEMBER:
+
+defineConfig()
+    ↓
+Defines Playwright configuration
+    ↓
+Contains different configuration settings
+    ↓
+Playwright uses these settings when executing tests.
+
+------------------------
+Sequential Execution vs Parallel Execution in Playwright
+------------------------
+
+The basic difference is:
+
+Sequential execution = tests run one after another.
+Parallel execution = multiple tests run at the same time.
+
+------------------------
+1. Sequential Execution
+------------------------
+
+In sequential execution, Playwright runs one test, waits for it to finish, and then starts the next test.
+
+Suppose you have:
+
+test('Test 1', async ({ page }) => {
+    // Test 1
+});
+
+test('Test 2', async ({ page }) => {
+    // Test 2
+});
+
+test('Test 3', async ({ page }) => {
+    // Test 3
+});
+
+The execution will be:
+
+Test 1
+  ↓
+Test 1 completes
+  ↓
+Test 2
+  ↓
+Test 2 completes
+  ↓
+Test 3
+  ↓
+Test 3 completes
+
+So:
+Test 1 → Test 2 → Test 3
+Only one test is executing at a time within that worker.
+
+------------------------
+2. Parallel Execution
+------------------------
+
+In parallel execution, Playwright can run multiple tests at the same time using multiple workers.
+
+For example:
+
+Worker 1 → Test 1
+Worker 2 → Test 2
+Worker 3 → Test 3
+Worker 4 → Test 4
+
+Instead of:
+
+Test 1
+  ↓
+Test 2
+  ↓
+Test 3
+  ↓
+Test 4
+
+they can execute approximately like:
+
+Test 1 ──────────→
+Test 2 ──────────→
+Test 3 ──────────→
+Test 4 ──────────→
+
+This can significantly reduce the total execution time when you have many independent tests.
+
+------------------------
+3. What is a Worker?
+------------------------
+
+A worker is a separate process used by Playwright Test to execute tests.
+
+For example, if you configure:
+workers: 4
+
+Playwright can use up to 4 workers to execute tests.
+
+Think of it like having 4 people doing testing:
+
+Worker 1 → Test A
+Worker 2 → Test B
+Worker 3 → Test C
+Worker 4 → Test D
+
+Instead of one person doing everything:
+Worker 1 → Test A → Test B → Test C → Test D
+
+------------------------
+4. How to Configure Workers
+------------------------
+
+In playwright.config.ts:
+
+export default defineConfig({
+
+    testDir: './tests',
+
+    workers: 4,
+
+});
+
+This allows Playwright to use up to 4 worker processes.
+
+You can also run tests from the command line:
+
+npx playwright test --workers=4
+
+------------------------
+5. Is Playwright Parallel by Default?
+------------------------
+
+Playwright Test is designed to support parallel execution.
+
+By default, tests in different test files can be distributed across workers.
+
+For example, suppose you have:
+
+tests/
+│
+├── login.spec.ts
+├── signup.spec.ts
+├── dashboard.spec.ts
+└── orders.spec.ts
+
+Playwright can distribute them among workers:
+
+Worker 1 → login.spec.ts
+Worker 2 → signup.spec.ts
+Worker 3 → dashboard.spec.ts
+Worker 4 → orders.spec.ts
+
+The exact distribution depends on the number of workers and tests.
+`
+------------------------
+6. Sequential vs Parallel Example
+------------------------
+
+Suppose each test takes 10 seconds.
+
+You have 4 tests.
+
+Sequential
+
+Test 1 → 10 sec
+Test 2 → 10 sec
+Test 3 → 10 sec
+Test 4 → 10 sec
+
+Total ≈ 40 seconds
+
+Parallel — 4 workers
+
+Worker 1 → Test 1 → 10 sec
+Worker 2 → Test 2 → 10 sec
+Worker 3 → Test 3 → 10 sec
+Worker 4 → Test 4 → 10 sec
+
+Total ≈ 10 seconds
+
+This is why parallel execution is useful for large automation suites.
+
+------------------------
+7. Why Should We Use Parallel Execution?
+------------------------
+
+Faster test execution
+
+If you have hundreds of tests, running them sequentially can take a long time.
+
+Parallel execution allows multiple tests to run simultaneously.
+
+Better CI/CD performance
+
+In CI/CD pipelines, faster test execution is very important.
+
+For example:
+
+Without parallel execution
+        ↓
+500 tests
+        ↓
+Long execution time
+        ↓
+Slow deployment
+
+With parallel execution:
+
+500 tests
+    ↓
+Multiple workers
+    ↓
+Tests execute simultaneously
+    ↓
+Reduced execution time
+
+------------------------
+8. Important: Tests Should Be Independent
+------------------------
+
+Parallel execution works best when tests are independent.
+
+For example:
+
+Test 1 → Login
+Test 2 → Search
+Test 3 → Add product
+Test 4 → Logout
+
+If Test 4 depends on Test 1 being completed first, parallel execution can cause problems.
+
+For example:
+
+Test 1
+Creates User
+    ↓
+Test 2
+Uses the User created by Test 1
+
+These tests have a dependency.
+
+If they run in parallel:
+
+Test 1 ───────────────→ Creates User
+
+Test 2 ─────→ Tries to use User
+
+Test 2 might execute before Test 1 creates the user.
+
+Therefore:
+
+Good Playwright tests should generally be independent so that they can safely run in parallel.
+
+------------------------
+npx playwright test
+------------------------
+
+Runs your Playwright tests in headless mode by default.
+
+Headless means the browser runs in the background, and you won't see the browser window.
+
+npx playwright test
+
+Example:
+
+Run test
+   ↓
+Browser opens in background
+   ↓
+Test executes
+   ↓
+Browser closes
+   ↓
+Result shown in terminal
+
+------------------------
+npx playwright test --headed
+------------------------
+
+Runs your Playwright tests while showing the browser window.
+npx playwright test --headed
+
+You can see the browser opening and performing the actions.
+
+Run test
+   ↓
+Browser window opens
+   ↓
+You can see test actions
+   ↓
+Test completes
+   ↓
+Browser closes
+
+------------------------
+test vs test.only in Playwright
+------------------------
+
+1. test
+
+test() is used to define a normal test case.
+
+Example:
+
+import { test } from '@playwright/test';
+
+test('Login Test', async ({ page }) => {
+    // Test steps
+});
+
+test('Search Test', async ({ page }) => {
+    // Test steps
+});
+
+When you run: npx playwright test
+
+both tests will run.
+
+Login Test
+    ↓
+Search Test
+
+2. test.only
+
+test.only() is used when you want to run only a specific test and skip the other tests in the test file/suite.
+
+Example:
+
+test.only('Login Test', async ({ page }) => {
+    // Test steps
+});
+
+test('Search Test', async ({ page }) => {
+    // Test steps
+});
+
+When you run: npx playwright test
+
+Only: Login Test will run.
+
+Search Test will be skipped because test.only() has been used.
+
+------------------------
+ASSERTIONS
+------------------------
+
+Assertions are used to verify whether the actual result matches the expected result.
+
+In simple words:
+
+Assertion = Check / Verify
+
+
+Import:
+
+import { test, expect } from '@playwright/test';
+
+
+test
+    → Used to define a test case.
+
+expect
+    → Used to perform assertions/verification.
+
+
+------------------------
+TITLE PRINT
+------------------------
+
+To print the actual page title:
+
+console.log(await page.title());
+
+
+Example:
+
+test('Title Print', async ({ page }) => {
+
+    await page.goto('https://example.com');
+
+    console.log(await page.title());
+
+});
+
+
+console.log()
+    ↓
+Prints the actual title
+    ↓
+Does NOT verify whether the title is correct.
+
+
+------------------------
+TITLE VERIFY / ASSERTION
+------------------------
+
+To verify the page title:
+
+await expect(page).toHaveTitle('Example Domain');
+
+
+Example:
+
+test('Title Verification', async ({ page }) => {
+
+    await page.goto('https://example.com');
+
+    await expect(page).toHaveTitle('Example Domain');
+
+});
+
+
+expect()
+    ↓
+Verifies the expected result
+
+
+If actual title = expected title
+    ↓
+Test PASSES
+
+
+If actual title ≠ expected title
+    ↓
+Test FAILS
+
+
+------------------------
+EASY WAY TO REMEMBER
+------------------------
+
+console.log()
+    ↓
+PRINT
+    ↓
+"What is the actual value?"
+
+
+expect()
+    ↓
+VERIFY / ASSERT
+    ↓
+"Is the actual value what I expected?"
+
+------------------------
+headless: false
+------------------------
+
+headless controls whether the browser is visible during test execution.
+
+use: {
+    headless: false,
+}
+
+Means:
+
+Show the browser while the test is running.
+
+Simple:
+
+headless: true
+    → Browser hidden
+
+headless: false
+    → Browser visible
+	
+Some commonly used ones are:
+
+use: {
+    browserName: 'chromium',
+    headless: false,
+    screenshot: 'on',
+    video: 'on',
+    trace: 'on',
+    baseURL: 'https://example.com',
+}
+
+Simple meaning
+
+| Setting       | Meaning                                     |
+| ------------- | ------------------------------------------- |
+| `browserName` | Which browser to use                        |
+| `headless`    | Show/hide browser                           |
+| `screenshot`  | Take screenshots                            |
+| `video`       | Record test execution                       |
+| `trace`       | Capture detailed test execution information |
+| `baseURL`     | Common URL for your tests                   |
