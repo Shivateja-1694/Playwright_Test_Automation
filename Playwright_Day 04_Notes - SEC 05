@@ -1,0 +1,898 @@
+--------------------------------
+DAY 04 — 08/23 — SUNDAY
+--------------------------------
+
+--------------
+SECTION 05
+--------------
+
+--------------------------------
+UI Controls in Playwright
+--------------------------------
+
+This test automates different UI controls on the login page, 
+such as text fields, radio buttons, dropdown, checkbox, and button.
+
+1. Start the test
+test.only('UI Controls Playwright test', async ({page}) => {
+
+test.only() → Runs only this test.
+{page} → Playwright provides the page fixture.
+async → Allows us to use await.
+
+2. Open the website
+await page.goto("https://rahulshettyacademy.com/loginpagePractise/");
+
+→ Opens the login page.
+
+3. Create locators
+
+const userName = page.locator('#username');
+const password = page.locator("#password");
+const signInBtn = page.locator('#signInBtn');
+const radioBtns = page.locator('.customradio');
+const dropdown = page.locator('select.form-control');
+const checkBox = page.locator('#terms');
+
+Here, we create reusable locators for different UI elements.
+
+userName    → Username field
+password    → Password field
+signInBtn   → Sign In button
+radioBtns   → Radio buttons
+dropdown    → Dropdown
+checkBox    → Terms checkbox
+
+4. Enter Username
+await userName.fill('rahulshettyacademy');
+
+→ Enters the username into the username field.
+
+5. Enter Password
+await password.fill('Learning@830$3mK2');
+
+→ Enters the password.
+
+6. Select Radio Button
+await radioBtns.last().click();
+
+→ radioBtns represents multiple radio buttons.
+→ .last() selects the last radio button.
+→ .click() selects it.
+
+7. Handle Popup
+await page.locator('#okayBtn').click();
+
+→ Locates the OK button of the popup and clicks it.
+
+8. Select Dropdown Option
+await dropdown.selectOption('consult');
+
+→ Selects the dropdown option whose value is consult.
+
+selectOption() is specifically used for HTML <select> dropdowns.
+
+9. Select Checkbox
+await checkBox.check();
+
+→ Checks/selects the checkbox.
+
+10. Click Sign In
+await signInBtn.click();
+
+→ Clicks the Sign In button.
+
+11. page.pause()
+await page.pause();
+
+→ Pauses the test execution and opens Playwright Inspector.
+
+It is useful for debugging and inspecting the test step-by-step.
+
+
+--------------------------------
+Complete Execution Flow:
+--------------------------------
+
+Open Login Page
+       ↓
+Enter Username
+       ↓
+Enter Password
+       ↓
+Select Radio Button
+       ↓
+Click OK on Popup
+       ↓
+Select Dropdown Option
+       ↓
+Check Checkbox
+       ↓
+Click Sign In
+       ↓
+Pause for Debugging
+
+--------------------------------
+UI Controls Covered:
+--------------------------------
+
+fill()
+    → Text fields
+
+click()
+    → Buttons / Radio buttons
+
+selectOption()
+    → Dropdown
+
+check()
+    → Checkbox
+
+page.pause()
+    → Debugging
+
+--------------------------------
+UI Controls — New Lines
+--------------------------------
+
+await expect(checkBox).toBeChecked();
+
+→ Verifies that the checkbox is checked.
+→ If checked → PASS
+→ If not checked → FAIL
+
+await checkBox.uncheck();
+
+→ Unchecks/deselects the checkbox.
+
+await expect(checkBox).not.toBeChecked();
+
+→ Verifies that the checkbox is NOT checked.
+→ If unchecked → PASS
+→ If checked → FAIL
+
+expect(await checkBox.isChecked()).toBeFalsy();
+
+→ isChecked() checks whether the checkbox is currently checked.
+→ toBeFalsy() verifies that the result is false.
+
+In simple terms:
+	Verify that the checkbox is not checked.
+	
+expect(await radioBtns.last().isChecked()).toBeTruthy();
+
+→ Selects the last radio button.
+→ isChecked() checks whether it is selected.
+→ toBeTruthy() verifies that the result is true.
+
+In simple terms:
+	Verify that the last radio button is selected.
+	
+	
+Quick Revision
+
+click()
+→ Click an element
+
+selectOption()
+→ Select dropdown option
+
+check()
+→ Check checkbox
+
+uncheck()
+→ Uncheck checkbox
+
+toBeChecked()
+→ Verify checkbox/radio is checked
+
+not.toBeChecked()
+→ Verify checkbox/radio is NOT checked
+
+isChecked()
+→ Get whether checkbox/radio is checked
+
+toBeTruthy()
+→ Verify result is true
+
+toBeFalsy()
+→ Verify result is false
+
+--------------------------------
+await with Playwright Assertions vs Methods
+--------------------------------
+
+The difference is because toBeChecked() is a Playwright assertion, while isChecked() is a method that returns a value.
+
+1. await outside
+
+await expect(checkBox).not.toBeChecked();
+
+Here, expect(checkBox).not.toBeChecked() is a Playwright assertion.
+Playwright needs to wait and retry the assertion until it passes or the assertion timeout is reached.
+
+So:
+
+await
+ ↓
+Wait for the Playwright assertion to complete
+
+2. await inside
+
+expect(await radioBtns.last().isChecked()).toBeTruthy();
+
+Here, isChecked() is a Playwright method that returns a value (true or false).
+So we first need to wait for isChecked() to give us the result:
+
+await radioBtns.last().isChecked()
+             ↓
+          true/false
+             ↓
+expect(...)
+             ↓
+toBeTruthy()
+
+That's why await is inside expect().
+
+Easy way to remember
+
+Playwright Assertion
+await expect(locator).toBeChecked();
+
+Get a value first
+expect(await locator.isChecked()).toBeTruthy();
+
+Key difference:
+
+toBeChecked() → assertion → await goes outside
+isChecked() → returns a value → await goes inside
+
+Yes. toBeChecked() is also a method, but more specifically, it is an assertion matcher provided by Playwright Test.
+
+The important difference is what the method does and what it returns:
+await expect(checkBox).toBeChecked();
+
+toBeChecked() → assertion matcher
+It verifies that the checkbox is checked.
+Playwright automatically waits/retries the assertion.
+Therefore, await is placed outside the complete assertion.
+
+Whereas:
+expect(await checkBox.isChecked()).toBeTruthy();
+
+isChecked() → Playwright locator method
+It returns a value: true or false.
+We need await to get that value first.
+Then expect() verifies the returned value.
+
+Simple comparison
+
+toBeChecked()
+    → Verify directly
+    → Playwright assertion
+    → await outside
+
+isChecked()
+    → Get true/false
+    → Playwright method
+    → await inside
+	
+	
+So your earlier understanding can be refined to:
+
+Both are methods, but toBeChecked() is an assertion matcher, 
+while isChecked() is a locator method that returns a boolean.
+
+--------------------------------
+Handling Child Windows / New Tabs Using context.waitForEvent('page')
+--------------------------------
+
+This code handles a new browser tab/window (child page) that opens when clicking a link.
+
+
+test.only('Child Window Playwright test', async ({page, context}) => {  
+
+    await page.goto("https://rahulshettyacademy.com/loginpagePractise/");
+
+    const documentLink = page.locator('.blinkingText');
+
+    const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        documentLink.first().click(),
+    ]);
+
+    const text = await newPage.locator('.red').textContent();
+    console.log(text);
+});
+
+
+1. page and context
+
+async ({page, context})
+
+page → Current browser tab.
+context → Browser context containing the current page and any new pages/tabs opened from it.
+
+2. Locate the link
+
+const documentLink = page.locator('.blinkingText');
+
+→ Creates a locator for the link that opens the child window/tab.
+
+3. Wait for the new page
+
+const [newPage] = await Promise.all([
+    context.waitForEvent('page'),
+    documentLink.first().click(),
+]);
+
+This is the main part of the code.
+
+context.waitForEvent('page')
+
+→ Tells Playwright:
+	"Wait for a new page/tab to be opened."
+	
+documentLink.first().click()
+
+→ Clicks the link that opens the new page.
+
+Why Promise.all()?
+
+Both operations need to happen together:
+
+Wait for new page
+       +
+Click the link
+       ↓
+New page opens
+       ↓
+newPage receives the new tab
+
+newPage represents the newly opened child window/tab.
+
+4. Get text from the child window
+
+const text = await newPage.locator('.red').textContent();
+
+Notice that we use:
+	newPage
+instead of:
+	page
+
+because .red is located on the newly opened page.
+
+5. Print the text
+
+console.log(text);
+→ Prints the text from the child window in the console.
+
+Easy Flow
+
+Main Page
+   ↓
+Find Child Window Link
+   ↓
+Click Link
+   ↓
+New Tab/Window Opens
+   ↓
+Capture New Page
+   ↓
+newPage
+   ↓
+Locate Element
+   ↓
+Get Text
+   ↓
+Print Text
+
+Key Point
+
+When clicking an element opens a new tab/window, 
+use context.waitForEvent('page') to wait for and capture the newly opened page.
+
+--------------------------------
+EXTRACTING EMAIL DOMAIN USING split() IN JAVASCRIPT/TYPESCRIPT
+--------------------------------
+
+Reference Text:
+
+Please email us at mentor@rahulshettyacademy.com with below template to receive response
+
+
+Code:
+
+const arrayText = text.split('@');
+const domain = arrayText[1].split(' ')[0];
+
+console.log(domain);
+
+
+What happens overall?
+
+Complete text
+     ↓
+split('@')
+     ↓
+Separate text at @
+     ↓
+Take the text after @
+     ↓
+split(' ')
+     ↓
+Take the first part
+     ↓
+rahulshettyacademy.com
+
+
+--------------------------------
+1. FIRST LINE
+--------------------------------
+
+const arrayText = text.split('@');
+
+
+split('@')
+
+→ Splits the complete text wherever `@` occurs.
+
+Text:
+
+Please email us at mentor@rahulshettyacademy.com with below template to receive response
+
+
+After split('@'):
+
+arrayText[0]
+→ Please email us at mentor
+
+arrayText[1]
+→ rahulshettyacademy.com with below template to receive response
+
+
+So, the required domain is now inside:
+
+arrayText[1]
+
+
+--------------------------------
+2. SECOND LINE
+--------------------------------
+
+const domain = arrayText[1].split(' ')[0];
+
+
+First:
+
+arrayText[1]
+
+contains:
+
+rahulshettyacademy.com with below template to receive response
+
+
+Then:
+
+.split(' ')
+
+splits the text wherever there is a space.
+
+Result:
+
+[0] → rahulshettyacademy.com
+[1] → with
+[2] → below
+[3] → template
+[4] → to
+[5] → receive
+[6] → response
+
+
+Then:
+
+[0]
+
+selects the first item:
+
+rahulshettyacademy.com
+
+
+Therefore:
+
+domain = "rahulshettyacademy.com"
+
+
+--------------------------------
+3. PRINT THE DOMAIN
+--------------------------------
+
+console.log(domain);
+
+
+→ Prints the extracted domain in the console.
+
+
+Output:
+
+rahulshettyacademy.com
+
+
+--------------------------------
+IMPORTANT CONCEPT
+--------------------------------
+
+This code uses TWO split() operations:
+
+text.split('@')
+    ↓
+Separates the text at @
+
+arrayText[1].split(' ')
+    ↓
+Separates the remaining text at the first space
+
+[0]
+    ↓
+Takes the first part
+
+
+Final:
+
+mentor@rahulshettyacademy.com
+        ↓
+rahulshettyacademy.com
+
+
+NOTE:
+
+This approach works for this particular sentence format.
+
+It is a simple string-manipulation technique and is not a
+general-purpose email parser.
+
+---------------------------------------
+CHILD WINDOW HANDLING + EXTRACTING DATA FROM NEW PAGE
+---------------------------------------
+
+At a high level, this test demonstrates how to:
+
+→ Handle a child/new browser window in Playwright
+→ Extract text from the new page
+→ Process the extracted text to get an email domain
+→ Use the extracted value in the original page
+
+
+---------------------------------------
+OVERALL FLOW
+---------------------------------------
+
+Open Login Page
+      ↓
+Find the link that opens a new window
+      ↓
+Click the link and capture the new page
+      ↓
+Read text from the new page
+      ↓
+Extract the email domain
+      ↓
+Continue working with the original page
+      ↓
+Enter the extracted domain into the username field
+
+
+---------------------------------------
+1. TEST SETUP
+---------------------------------------
+
+test.only('Child Window Playwright test', async ({page, context}) => {
+
+Creates a Playwright test with:
+
+page
+→ Represents the original browser page.
+
+context
+→ Represents the browser context.
+→ It can be used to listen for newly opened pages/windows.
+
+
+---------------------------------------
+2. OPEN THE LOGIN PAGE
+---------------------------------------
+
+await page.goto("https://rahulshettyacademy.com/loginpagePractise/");
+
+→ Opens the login page in the original browser page.
+
+
+---------------------------------------
+3. LOCATE THE CHILD WINDOW LINK
+---------------------------------------
+
+const documentLink = page.locator('.blinkingText');
+
+→ Locates the link that opens the child/new page.
+
+
+---------------------------------------
+4. HANDLE THE CHILD WINDOW
+---------------------------------------
+
+const [newPage] = await Promise.all([
+    context.waitForEvent('page'),
+    documentLink.first().click(),
+])
+
+
+This is the main part of child-window handling.
+
+Playwright simultaneously:
+
+→ Waits for a new page to be created.
+→ Clicks the link that opens the new page.
+→ Captures the newly opened page in `newPage`.
+
+
+So now we have:
+
+page
+ ↓
+Original Login Page
+
+newPage
+ ↓
+Child / New Page
+
+
+---------------------------------------
+5. EXTRACT TEXT FROM THE NEW PAGE
+---------------------------------------
+
+const text = await newPage.locator('.red').textContent();
+
+→ Uses `newPage` to locate the `.red` element.
+→ Retrieves the text from the child/new page.
+
+For example:
+
+Please email us at mentor@rahulshettyacademy.com with below template...
+
+
+console.log(text);
+
+→ Prints the extracted text in the console.
+
+
+---------------------------------------
+6. EXTRACT THE EMAIL DOMAIN
+---------------------------------------
+
+const arrayText = text.split('@');
+
+const domain = arrayText[1].split(' ')[0];
+
+
+The extracted text is processed using `split()`.
+
+For example:
+
+mentor@rahulshettyacademy.com
+       ↓
+rahulshettyacademy.com
+
+
+So:
+
+domain
+   ↓
+rahulshettyacademy.com
+
+
+console.log(domain);
+
+→ Prints the extracted domain.
+
+
+---------------------------------------
+7. USE THE EXTRACTED VALUE IN THE ORIGINAL PAGE
+---------------------------------------
+
+await page.locator('#username').fill(domain);
+
+Here we use:
+
+page
+→ Original Login Page
+
+domain
+→ Extracted value from the child page
+
+
+Flow:
+
+Child/New Page
+      ↓
+Extract Email Domain
+      ↓
+Original Page
+      ↓
+Enter Domain into #username
+
+
+IMPORTANT:
+
+We are NOT navigating back to the original page.
+
+The original page is still available through the `page` variable.
+
+We simply continue interacting with the original page.
+
+
+---------------------------------------
+8. VERIFY THE USERNAME VALUE
+---------------------------------------
+
+console.log(await page.locator('#username').textContent());
+
+⚠️ For an `<input>` field, `textContent()` normally does not return
+the value entered into the input field.
+
+Use:
+
+console.log(await page.locator('#username').inputValue());
+
+
+Why?
+
+fill(domain)
+   ↓
+Sets the input's `value` property
+   ↓
+inputValue()
+   ↓
+Gets the entered value
+
+
+Therefore:
+
+textContent()
+→ Gets text content between an element's tags.
+
+inputValue()
+→ Gets the current value of an input/textarea/select element.
+
+
+---------------------------------------
+EASY WAY TO REMEMBER
+---------------------------------------
+
+Child Page
+    ↓
+newPage
+    ↓
+Extract text
+    ↓
+Process text using split()
+    ↓
+Get email domain
+    ↓
+Original Page
+    ↓
+Fill domain into username
+    ↓
+inputValue()
+    ↓
+Verify entered value
+
+------------------------------------
+DIFFERENCE BETWEEN textContent() AND inputValue() IN PLAYWRIGHT
+------------------------------------
+
+The main difference is what type of data they read from an element.
+
+
+------------------------------------
+1. textContent()
+------------------------------------
+
+Used to get the text content inside an HTML element.
+
+Example:
+
+<h4>iPhone X</h4>
+
+const text = await page.locator('h4').textContent();
+
+console.log(text);
+
+
+Output:
+
+iPhone X
+
+
+So:
+
+textContent()
+→ Gets the text content of an element.
+
+
+------------------------------------
+2. inputValue()
+------------------------------------
+
+Used to get the current value of an input-type element.
+
+Example:
+
+<input id="username" value="rahul">
+
+const value = await page.locator('#username').inputValue();
+
+console.log(value);
+
+
+Output:
+
+rahul
+
+
+So:
+
+inputValue()
+→ Gets the current value of an <input>, <textarea>, or <select> element.
+
+
+------------------------------------
+EASY COMPARISON
+------------------------------------
+
+| Method          | Used For                         | Example                 |
+|-----------------|----------------------------------|-------------------------|
+| textContent()   | Text content of an element      | <h4>iPhone X</h4>       |
+| inputValue()    | Current value of form element   | <input value="rahul">   |
+
+
+------------------------------------
+REMEMBER THIS
+------------------------------------
+
+Normal text element
+        ↓
+textContent()
+
+
+Input / Textarea / Select
+        ↓
+inputValue()
+
+
+------------------------------------
+EXAMPLE FROM PREVIOUS CODE
+------------------------------------
+
+await page.locator('#username').fill(domain);
+
+
+To verify what was entered into the username field:
+
+console.log(await page.locator('#username').inputValue());
+
+
+Output:
+
+rahulshettyacademy.com
+
+
+------------------------------------
+SIMPLE RULE
+------------------------------------
+
+textContent()
+→ Reads text content from an element.
+
+inputValue()
+→ Reads the current value of a form element such as
+  <input>, <textarea>, or <select>.
