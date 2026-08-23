@@ -1,0 +1,1269 @@
+--------------------------------
+DAY 03 — 08/16 — SUNDAY
+--------------------------------
+
+--------------
+SECTION 04
+--------------
+
+------------------------
+Locators in Playwright
+------------------------
+
+A locator is used to identify and interact with an element on a web page.
+
+For example, if we want to click a button:
+await page.locator('#login').click();
+
+Here:
+
+#login
+   ↓
+Locator
+   ↓
+Identifies the login element
+
+CSS Selector vs XPath in Playwright
+
+------------------------
+Playwright supports different ways of locating elements, including:
+------------------------
+
+CSS Selectors
+XPath
+Text
+Playwright-specific locators such as getByRole(), getByText(), getByLabel(), etc.
+
+For basic CSS locator usage, we can use the following syntax.
+
+------------------------
+1. If id is present
+------------------------
+
+Suppose HTML is:
+<input id="username">
+
+CSS Syntax
+#id
+
+or:
+tagname#id
+
+Examples
+await page.locator('#username');
+
+or:
+await page.locator('input#username');
+
+Both identify the same element.
+
+Easy way to remember
+# → ID
+
+------------------------
+2. If class attribute is present
+------------------------
+
+Suppose HTML is:
+<input class="username">
+
+CSS Syntax
+.class
+
+or:
+tagname.class
+
+Examples
+await page.locator('.username');
+
+or:
+await page.locator('input.username');
+
+Easy way to remember
+. → Class
+
+------------------------
+3. CSS Traversing — Parent to Child
+------------------------
+
+Sometimes we need to locate a child element inside a parent element.
+
+Example:
+
+<div>
+    <button>Login</button>
+</div>
+
+We can locate the button using the parent-child relationship.
+
+Syntax
+parenttagname >> childtagname
+
+Example:
+await page.locator('div >> button');
+
+Meaning:
+div
+ ↓
+button
+
+So Playwright searches for the button inside the div.
+
+Note: Modern CSS selectors can also express parent-to-descendant relationships using a space, 
+such as div button. Playwright also supports the >> selector syntax, but for new code, 
+Playwright's recommended locators such as getByRole() 
+are generally preferable when they provide a good semantic target.
+
+------------------------
+4. Locator Based on Text
+------------------------
+
+Sometimes we want to locate an element based on the text displayed on the page.
+
+For example:
+<button>Login</button>
+
+We can use:
+await page.getByText('Login');
+
+or, when using Playwright's CSS/text selector syntax:
+await page.locator('text=Login');
+
+Example
+await page.getByText('Login').click();
+
+--------------------------------
+SINGLE QUOTE ' VS DOUBLE QUOTE "
+--------------------------------
+
+Both can be used to write strings in JavaScript/TypeScript.
+
+'text'
+"text"
+
+Both mean the same thing.
+
+
+Example:
+
+await page.locator('#username');
+
+await page.locator("#username");
+
+Both are valid.
+
+
+WHY DO WE SOMETIMES SEE BOTH?
+
+It depends on which quote is already present inside the string.
+
+Example:
+
+page.locator("[style*='block']")
+
+Here:
+
+"        → Outer quote
+'block'  → Inner quote
+
+This is convenient because the inner and outer quotes are different.
+
+
+Another example:
+
+page.locator('[style*="block"]')
+
+Here:
+
+'        → Outer quote
+"block"  → Inner quote
+
+This is also valid.
+
+
+EASY RULE TO REMEMBER:
+
+'text'
+    OR
+"text"
+
+Both are valid.
+
+When you have quotes inside the locator, use different
+outer and inner quotes to make the string easier to write.
+
+
+Example:
+
+"[style*='block']"   ✅
+'[style*="block"]'   ✅
+
+
+IMPORTANT:
+
+The quotes are mainly JavaScript/TypeScript string syntax.
+They are not part of the CSS selector itself.
+
+CSS selector:
+[style*='block']
+
+JavaScript string containing that selector:
+"[style*='block']"
+
+------------------------
+fill() vs type() in Playwright
+------------------------
+
+Both methods are used to enter text into input fields.
+
+1. fill()
+
+fill() enters the complete text at once.
+await page.locator('#username').fill('Shiva');
+
+Meaning:
+Input field
+    ↓
+Shiva
+
+It also clears the existing value first and then enters the new value.
+
+2. type()
+
+type() enters the text character by character, similar to typing on a keyboard.
+await page.locator('#username').type('Shiva');
+
+Conceptually:
+S → h → i → v → a
+
+You can also add a delay between characters:
+await page.locator('#username').type('Shiva', { delay: 100 });
+
+Main Difference
+
+| `fill()`                             | `type()`                                          |
+| ------------------------------------ | ------------------------------------------------- |
+| Enters text quickly                  | Types character by character                      |
+| Clears existing value first          | Does not automatically clear existing value       |
+| Generally preferred for normal input | Useful when you specifically need typing behavior |
+
+For normal Playwright automation, fill() is usually the preferred method for entering input values.
+
+--------------------------------
+AUTOMATING LOGIN PAGE IN PLAYWRIGHT USING JAVASCRIPT
+--------------------------------
+
+Playwright can automate the login process by locating the username
+and password fields, entering the required credentials, and clicking
+the Login button.
+
+Example:
+
+import { test, expect } from '@playwright/test';
+
+test('Login Page Test', async ({ page }) => {
+
+    await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
+
+    await page.locator('#username').fill('rahulshettyacademy');
+
+    await page.locator('#password').fill('Learning@830$3mK2');
+
+    await page.locator('#signInBtn').click();
+
+});
+
+
+Execution Flow:
+
+import Playwright
+      ↓
+Define test
+      ↓
+Open Login Page
+      ↓
+Enter Username
+      ↓
+Enter Password
+      ↓
+Click Login
+
+
+Explanation:
+
+1. Username
+
+await page.locator('#username').fill('rahulshettyacademy');
+
+→ Locates the element using its ID `username`
+→ Enters the username using `fill()`
+
+
+2. Password
+
+await page.locator('#password').fill('Learning@830$3mK2');
+
+→ Locates the password field using its ID `password`
+→ Enters the password using `fill()`
+
+
+3. Login Button
+
+await page.locator('#signInBtn').click();
+
+→ Locates the Login button using its ID `signInBtn`
+→ Clicks the button to submit the login form
+
+
+Important:
+
+`await` is used because these Playwright actions are asynchronous.
+Playwright waits for each action to complete before moving to the
+next statement.
+
+Here:
+
+test → Defines the test case
+page → Playwright page fixture
+page.goto() → Opens the URL
+locator() → Identifies the element
+fill() → Enters text
+click() → Clicks the button
+await → Waits for each operation to complete
+
+--------------------------------
+CSS Selector: * vs No *
+--------------------------------
+
+| Syntax | Meaning         | Example                     |
+| ------ | --------------- | --------------------------- |
+| `=`    | **Exact match** | `[style='display: block;']` |
+| `*=`   | **Contains**    | `[style*='block']`          |
+
+// Using * → Contains "block"
+console.log(await page.locator("[style*='block']").textContent());
+
+// Without * → Exact match
+console.log(await page.locator("[style='display: block;']").textContent());
+
+--------------------------------
+HANDLING LOGIN ERROR MESSAGES IN PLAYWRIGHT
+--------------------------------
+
+Objective:
+
+Automate the login page using incorrect username/password credentials,
+locate the error message displayed by the application, and print the
+message in the console.
+
+
+1. Open the Login Page
+
+await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
+
+
+2. Enter Invalid Username
+
+await page.locator('#username').fill('rahulshettyacademy112');
+
+
+3. Enter Password
+
+await page.locator('#password').fill('Learning@830$3mK2');
+
+
+4. Click Login Button
+
+await page.locator('#signInBtn').click();
+
+
+5. Locate the Error Message
+
+await page.locator("[style*='block']").textContent();
+
+`[style*='block']`
+    → Finds an element whose style attribute contains `block`.
+
+`textContent()`
+    → Retrieves the text displayed inside the element.
+
+
+6. Print the Error Message
+
+console.log(
+    await page.locator("[style*='block']").textContent()
+);
+
+`console.log()`
+    → Prints the retrieved error message in the console.
+
+
+Execution Flow:
+
+Open Login Page
+      ↓
+Enter Invalid Username
+      ↓
+Enter Password
+      ↓
+Click Login
+      ↓
+Error Message Appears
+      ↓
+Locate Error Message
+      ↓
+Get Text using textContent()
+      ↓
+Print in Console
+
+
+Key Point:
+
+`textContent()` is used to GET the text.
+
+`console.log()` is used to PRINT the text.
+
+This is used to read and display the application's login error
+message when incorrect credentials are entered.
+
+
+--------------------------------
+PRINTING AND VERIFYING ERROR MESSAGE
+--------------------------------
+
+1. Print the Error Message
+
+console.log(await page.locator("[style*='block']").textContent());
+
+→ Locates the error message.
+→ Gets the text using textContent().
+→ Prints the actual error message in the console.
+
+
+2. Verify the Error Message
+
+await expect(page.locator("[style*='block']"))
+    .toContainText('Incorrect');
+
+→ Locates the error message.
+→ Verifies that the message contains the text "Incorrect".
+→ If "Incorrect" is present → Test PASSES.
+→ If "Incorrect" is not present → Test FAILS.
+
+
+Key Difference:
+
+console.log()
+    ↓
+Prints the actual text.
+
+expect().toContainText()
+    ↓
+Verifies the expected text.
+
+
+Easy Way to Remember:
+
+PRINT → console.log()
+
+VERIFY → expect()
+
+--------------------------------
+textContent() vs toContainText()
+--------------------------------
+
+textContent()
+→ Gets the actual text from the located element.
+
+Example:
+await page.locator("[style*='block']").textContent();
+
+
+toContainText('Incorrect')
+→ Verifies that the located element contains the expected text "Incorrect".
+
+Example:
+await expect(page.locator("[style*='block']"))
+    .toContainText('Incorrect');
+
+
+Easy Way to Remember:
+
+textContent()
+    ↓
+GET the text
+
+toContainText()
+    ↓
+VERIFY the text
+
+--------------------------------
+CLEARING AN INPUT FIELD USING fill()
+--------------------------------
+
+await userName.fill("");
+
+→ Clears the username input field.
+
+If the field currently contains:
+
+[ admin ]
+
+After:
+
+await userName.fill("");
+
+It becomes:
+
+[          ]
+
+fill("")
+→ Replaces the existing value with an empty string.
+→ Therefore, the input field becomes empty.
+
+--------------------------------
+CREATING AND USING PLAYWRIGHT LOCATORS WITH page.locator()
+--------------------------------
+
+Locators can be stored in variables and reused multiple times.
+
+Example:
+
+const userName = page.locator('#username');
+const password = page.locator('#password');
+const signInBtn = page.locator('#signInBtn');
+
+
+Here:
+
+userName
+    → Locator for the username field.
+
+password
+    → Locator for the password field.
+
+signInBtn
+    → Locator for the Sign In button.
+
+
+Using the Locators:
+
+await userName.fill('rahulshettyacademy');
+
+→ Enters the username.
+
+
+await password.fill('Learning@123');
+
+→ Enters the password.
+
+
+await signInBtn.click();
+
+→ Clicks the Sign In button.
+
+
+Execution Flow:
+
+Create Username Locator
+        ↓
+Create Password Locator
+        ↓
+Create Sign In Button Locator
+        ↓
+Enter Username
+        ↓
+Enter Password
+        ↓
+Click Sign In
+
+
+Key Point:
+
+Instead of repeatedly writing:
+
+page.locator('#username')
+
+we can store the locator in a variable:
+
+const userName = page.locator('#username');
+
+and then reuse it:
+
+await userName.fill('rahulshettyacademy');
+
+--------------------------------
+SELECTING SPECIFIC ELEMENTS USING .first(), .nth(), .last() AND .allTextContents()
+--------------------------------
+
+When a locator matches multiple elements, Playwright provides
+.first(), .nth(), and .last() to select a specific element.
+
+.allTextContents() can be used to get the text from ALL matching elements.
+
+Example:
+
+console.log(await page.locator(".card-body a").first().textContent());
+
+console.log(await page.locator(".card-body a").nth(1).textContent());
+
+console.log(await page.locator(".card-body a").last().textContent());
+
+console.log(await page.locator(".card-body a").allTextContents());
+
+
+.first()
+→ Selects the first matching element.
+
+.nth(index)
+→ Selects an element based on its index.
+
+.last()
+→ Selects the last matching element.
+
+.textContent()
+→ Gets the text from the selected element.
+
+.allTextContents()
+→ Gets the text from ALL matching elements.
+
+console.log()
+→ Prints the text in the console.
+
+--------------------------------
+Why .allTextContents() Returns [] Initially but Works After .first().textContent()
+--------------------------------
+
+--------------------------------
+REASON: TIMING / PAGE LOADING
+--------------------------------
+
+Example:
+
+const allTitle = await cardTitles.allTextContents();
+console.log(allTitle);
+
+Output:
+
+[]
+
+
+Why?
+
+→ The elements may not be loaded/present in the DOM yet.
+→ `.allTextContents()` gets the text from the elements that are
+  available at that moment.
+→ If no matching elements are available, it returns `[]`.
+
+
+--------------------------------
+WHEN .first().textContent() IS USED
+--------------------------------
+
+console.log(await cardTitles.first().textContent());
+
+const allTitle = await cardTitles.allTextContents();
+console.log(allTitle);
+
+
+What happens?
+
+.first().textContent()
+→ Waits for the first matching element to be available.
+→ During this time, the page/elements may finish loading.
+→ Now the other matching elements may also be available.
+→ Therefore, allTextContents() can return the values.
+
+
+Example Output:
+
+[
+    'iphone X',
+    'Samsung',
+    'Nokia'
+]
+
+
+--------------------------------
+IMPORTANT POINT
+--------------------------------
+
+.first() is NOT required before .allTextContents().
+
+.allTextContents()
+→ Can directly get text from multiple matching elements.
+
+If it returns:
+
+[]
+
+the likely reason is that the elements were not available
+when the method was executed.
+
+
+--------------------------------
+CORRECT APPROACH
+--------------------------------
+
+If the elements are dynamically loaded, wait for an expected
+element before getting all the text:
+
+await expect(cardTitles.first()).toBeVisible();
+
+const allTitle = await cardTitles.allTextContents();
+
+console.log(allTitle);
+
+
+--------------------------------
+EASY WAY TO REMEMBER
+--------------------------------
+
+allTextContents()
+    ↓
+Gets text from currently matching elements
+
+[]
+    ↓
+No matching elements were available at that moment
+
+first().textContent()
+    ↓
+Waits for the first matching element
+
+IMPORTANT:
+The issue is usually TIMING / SYNCHRONIZATION,
+not that allTextContents() requires first().
+
+--------------------------------
+INDEXING WITH .nth()
+--------------------------------
+
+Playwright uses zero-based indexing.
+
+nth(0) → 1st element
+nth(1) → 2nd element
+nth(2) → 3rd element
+nth(3) → 4th element
+   ...
+
+
+Example:
+
+page.locator(".card-body a").nth(1)
+
+→ Selects the 2nd matching element.
+
+
+--------------------------------
+EASY WAY TO REMEMBER
+--------------------------------
+
+.first()
+    → First element
+
+.nth(1)
+    → Second element
+
+.last()
+    → Last element
+
+.allTextContents()
+    → Text from ALL matching elements
+	
+--------------------------------
+Understanding [] with .allTextContents()
+--------------------------------
+
+.allTextContents()
+→ Returns the text of ALL matching elements as an Array.
+
+Example:
+
+console.log(await page.locator(".card-body a").allTextContents());
+
+Output:
+
+[ 'iphone X', 'Samsung', 'Nokia' ]
+
+Why []?
+
+[] represents an Array.
+
+Since .allTextContents() gets text from multiple elements, Playwright returns the results inside an array.
+
+Multiple elements
+       ↓
+allTextContents()
+       ↓
+Array
+       ↓
+[ 'iphone X', 'Samsung', 'Nokia' ]
+
+Accessing individual values
+
+const products = await page.locator(".card-body a").allTextContents();
+
+console.log(products[0]); // iphone X
+console.log(products[1]); // Samsung
+console.log(products[2]); // Nokia
+
+products[0] → 1st value
+products[1] → 2nd value
+products[2] → 3rd value
+
+Easy way to remember:
+
+textContent()
+    → One text value
+
+allTextContents()
+    → Multiple text values
+    → Returned as an Array []
+
+--------------------------------
+UNDERSTANDING .card-body a USING HTML
+--------------------------------
+
+Example HTML:
+
+<div class="card-body">
+
+    <h4 class="card-title">
+        <a href="#">iphone X</a>
+    </h4>
+
+    <h5>$24.99</h5>
+
+    <p class="card-text">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+    </p>
+
+</div>
+
+
+--------------------------------
+1. UNDERSTAND THE HTML STRUCTURE
+--------------------------------
+
+Think of the HTML structure as a tree:
+
+div  ← class="card-body"
+│
+├── h4  ← class="card-title"
+│    │
+│    └── a
+│         └── "iphone X"
+│
+├── h5
+│    └── "$24.99"
+│
+└── p  ← class="card-text"
+     └── "Lorem ipsum..."
+
+
+The <a> element is inside the <h4>.
+
+The <h4> is inside the <div class="card-body">.
+
+
+--------------------------------
+2. WHAT DOES .card-body MEAN?
+--------------------------------
+
+.card-body
+
+The "." represents a class.
+
+.card-body
+
+means:
+
+"Find the element having class='card-body'."
+
+
+In the HTML:
+
+<div class="card-body">
+
+So:
+
+.card-body
+    ↓
+Selects the <div> with class="card-body".
+
+
+--------------------------------
+3. WHAT DOES a MEAN?
+--------------------------------
+
+a
+
+represents the <a> (anchor/link) element.
+
+Example:
+
+<a href="#">iphone X</a>
+
+
+So:
+
+a
+    ↓
+Finds an <a> element.
+
+
+--------------------------------
+4. WHAT DOES .card-body a MEAN?
+--------------------------------
+
+.card-body a
+
+There is a SPACE between:
+
+.card-body
+     and
+a
+
+
+The space means:
+
+"Find an <a> element inside .card-body."
+
+
+Structure:
+
+.card-body
+    ↓
+   h4
+    ↓
+    a
+
+
+Therefore:
+
+.card-body a
+
+selects:
+
+<a href="#">iphone X</a>
+
+
+--------------------------------
+5. IMPORTANT — DESCENDANT
+--------------------------------
+
+The <a> does NOT have to be a direct child of .card-body.
+
+Example:
+
+.card-body
+    ↓
+   h4
+    ↓
+    a
+
+
+.card-body a
+
+can find the <a> because <a> is a descendant of .card-body.
+
+
+In simple words:
+
+SPACE
+    ↓
+Means "inside / descendant"
+
+
+--------------------------------
+6. USING IT IN PLAYWRIGHT
+--------------------------------
+
+Example:
+
+page.locator(".card-body a")
+
+
+Meaning:
+
+"Locate the <a> element anywhere inside the element
+having class='card-body'."
+
+
+Example:
+
+console.log(
+    await page.locator(".card-body a").textContent()
+);
+
+
+Output:
+
+iphone X
+
+
+--------------------------------
+7. .card-body a vs .card-body > a
+--------------------------------
+
+.card-body a
+
+→ Finds an <a> anywhere inside .card-body.
+
+
+.card-body > a
+
+→ Finds an <a> only if it is a DIRECT CHILD of .card-body.
+
+
+Your HTML:
+
+<div class="card-body">
+    <h4>
+        <a>iphone X</a>
+    </h4>
+</div>
+
+
+Here:
+
+.card-body a
+    ↓
+    ✅ Works
+
+
+.card-body > a
+    ↓
+    ❌ Does NOT match
+
+because <a> is not a direct child of <div>.
+
+The <h4> is between them.
+
+
+--------------------------------
+8. EASY WAY TO REMEMBER
+--------------------------------
+
+.parent child
+
+    ↓
+
+Child can be anywhere inside the parent.
+
+
+.parent > child
+
+    ↓
+
+Child must be a DIRECT child of the parent.
+
+
+--------------------------------
+FINAL EXAMPLE
+--------------------------------
+
+HTML:
+
+<div class="card-body">
+    <h4 class="card-title">
+        <a href="#">iphone X</a>
+    </h4>
+</div>
+
+
+Locator:
+
+page.locator(".card-body a")
+
+
+Means:
+
+.card-body
+    ↓
+Find an <a>
+    ↓
+iphone X
+
+
+This is the basic CSS descendant/traversing concept
+used before learning:
+
+.first()
+.nth()
+.last()
+
+--------------------------------
+ASSIGNMENT-01 — E-Commerce Product Details
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+test('Automate e-Commerce website', async ({ page }) => {
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await page.locator('#userEmail').fill('anshika@gmail.com');
+    await page.locator('#userPassword').fill('Iamking@000');
+    await page.locator('#login').click();
+
+    const firstProductName =
+        await page.locator('.card-body b').first().textContent();
+
+    const lastProductName =
+        await page.locator('.card-body b').last().textContent();
+
+    const allProducts =
+        await page.locator('.card-body b').allTextContents();
+
+    const allProductsCount =
+        await page.locator('.card-body b').count();
+
+    console.log(firstProductName);
+    console.log(lastProductName);
+    console.log(allProducts);
+    console.log(allProductsCount);
+
+});
+
+--------------------------------
+What this assignment is doing
+--------------------------------
+
+Open E-Commerce Website
+        ↓
+Enter Email
+        ↓
+Enter Password
+        ↓
+Click Login
+        ↓
+Locate Product Names
+        ↓
+Get First Product
+        ↓
+Get Last Product
+        ↓
+Get All Products
+        ↓
+Count Total Products
+        ↓
+Print Results in Console
+
+--------------------------------
+Locators and methods used
+--------------------------------
+
+.card-body b
+    → Locates the product name elements
+
+.first()
+    → Gets the first product
+
+.last()
+    → Gets the last product
+
+.allTextContents()
+    → Gets the text of all products
+
+.count()
+    → Gets the total number of matching products
+
+.textContent()
+    → Gets the text of one selected element
+
+console.log()
+    → Prints the result in the console
+	
+	
+	
+One small point: you have imported expect, but you are not using it in this assignment. So this is also enough:
+
+import { test } from '@playwright/test';
+
+If you plan to add assertions later, keep:
+
+import { test, expect } from '@playwright/test';
+
+--------------------------------
+Playwright Waiting Methods — High-Level Explanation
+--------------------------------
+
+await page.waitForLoadState('networkidle');
+await page.locator('.card-body b').waitFor();
+await page.locator('.card-body b').waitFor({ state: 'visible' });
+await page.locator('.card-body b').first().waitFor();
+await page.locator('.card-body b').last().waitFor();
+
+1. page.waitForLoadState('networkidle')
+await page.waitForLoadState('networkidle');
+
+→ Waits until the page reaches the network idle state.
+
+In simple words:
+
+Wait until there are no or very few active network connections for a short period.
+
+Useful when the page loads data dynamically.
+
+2. .locator().waitFor()
+await page.locator('.card-body b').waitFor();
+
+→ Waits for the first matching element to be attached to the DOM.
+
+In simple words:
+
+Wait until the product element exists on the page.
+
+3. waitFor({ state: 'visible' })'
+await page.locator('.card-body b').waitFor({ state: 'visible' });
+
+→ Waits until the first matching element is visible.
+
+In simple words:
+
+Wait until the product element is actually visible to the user.
+
+4. .first().waitFor()
+await page.locator('.card-body b').first().waitFor();
+
+→ Selects the first matching element and waits for it to be attached to the DOM.
+
+In simple words:
+
+Wait specifically for the first product element.
+
+5. .last().waitFor()
+await page.locator('.card-body b').last().waitFor();
+
+→ Selects the last matching element and waits for it to be attached to the DOM.
+
+In simple words:
+
+Wait specifically for the last product element.
+
+Easy Way to Remember
+
+waitForLoadState()
+    ↓
+Wait for page loading/network activity
+
+locator().waitFor()
+    ↓
+Wait for element to exist
+
+waitFor({ state: 'visible' })
+    ↓
+Wait for element to be visible
+
+.first().waitFor()
+    ↓
+Wait for first matching element
+
+.last().waitFor()
+    ↓
+Wait for last matching element
+
+Important: Playwright already has built-in auto-waiting for most actions and assertions, 
+so you don't always need to manually add these waits.
