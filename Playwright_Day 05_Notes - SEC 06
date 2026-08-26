@@ -1,0 +1,3480 @@
+--------------------------------
+DAY 05 — 08/25 — TUESDAY
+--------------------------------
+
+--------------
+SECTION 06
+--------------
+
+--------------------------------
+ASSIGNMENT — FINDING A SPECIFIC PRODUCT AND CLICKING "ADD TO CART"
+--------------------------------
+
+OBJECTIVE
+--------------------------------
+
+This test demonstrates how to:
+
+→ Login to an e-commerce website.
+→ Locate all product cards.
+→ Get the total number of products.
+→ Loop through each product card.
+→ Find a specific product by its name.
+→ Select the matching product card using .nth().
+→ Click "Add To Cart" inside the matching product card.
+→ Stop the loop using break.
+→ Pause the test for debugging.
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+test.only('Automate e-Commerce website', async ({ page }) => {
+
+    const userName = page.locator('#userEmail');
+    const password = page.locator("#userPassword");
+    const loginBtn = page.locator('#login');
+    const products = page.locator('.card-body');
+    const productName = 'ADIDAS ORIGINAL';
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await userName.fill('anshika@gmail.com');
+    await password.fill('Iamking@000');
+    await loginBtn.click();
+
+    await page.waitForLoadState('networkidle');
+    await page.locator('.card-body b').first().waitFor();
+
+    const allProducts = await products.allTextContents();
+    const count = await products.count();
+
+    for (let i = 0; i < count; ++i) {
+
+        if (await products.nth(i).locator('b').textContent() === productName) {
+
+            await products.nth(i).locator("text= Add To Cart").click();
+
+            break;
+        }
+    }
+
+    await page.pause();
+
+});
+
+
+--------------------------------
+1. IMPORT PLAYWRIGHT
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+test
+→ Used to create and execute Playwright tests.
+
+expect
+→ Used for assertions.
+
+NOTE:
+`expect` is not used in this particular code, so it can be removed:
+
+import { test } from '@playwright/test';
+
+
+--------------------------------
+2. CREATE THE TEST
+--------------------------------
+
+test.only('Automate e-Commerce website', async ({ page }) => {
+
+test.only()
+→ Runs only this particular test.
+
+async
+→ Allows us to use await inside the test.
+
+{ page }
+→ `page` is a Playwright fixture.
+→ Represents the current browser page/tab.
+
+
+--------------------------------
+3. CREATE REUSABLE LOCATORS
+--------------------------------
+
+const userName = page.locator('#userEmail');
+
+→ Locates the email/username field.
+
+
+const password = page.locator("#userPassword");
+
+→ Locates the password field.
+
+
+const loginBtn = page.locator('#login');
+
+→ Locates the Login button.
+
+
+const products = page.locator('.card-body');
+
+→ Locates the complete product cards.
+
+IMPORTANT:
+
+`.card-body` represents the complete product card.
+
+A product card contains elements such as:
+
+Product Name
+Price
+Description
+Add To Cart button
+
+
+--------------------------------
+4. STORE THE REQUIRED PRODUCT NAME
+--------------------------------
+
+const productName = 'ADIDAS ORIGINAL';
+
+→ Stores the product name that we want to find.
+
+Instead of writing:
+
+'ADIDAS ORIGINAL'
+
+multiple times, we store it in a variable.
+
+productName
+    ↓
+ADIDAS ORIGINAL
+
+
+--------------------------------
+5. OPEN THE WEBSITE
+--------------------------------
+
+await page.goto("https://rahulshettyacademy.com/client");
+
+→ Opens the e-commerce website.
+
+
+--------------------------------
+6. ENTER USERNAME
+--------------------------------
+
+await userName.fill('anshika@gmail.com');
+
+→ Enters the email address into the username/email field.
+
+
+--------------------------------
+7. ENTER PASSWORD
+--------------------------------
+
+await password.fill('Iamking@000');
+
+→ Enters the password into the password field.
+
+
+--------------------------------
+8. CLICK LOGIN
+--------------------------------
+
+await loginBtn.click();
+
+→ Clicks the Login button.
+
+
+--------------------------------
+9. WAIT FOR PAGE LOADING
+--------------------------------
+
+await page.waitForLoadState('networkidle');
+
+→ Waits until the page reaches the `networkidle` state.
+
+In simple terms:
+
+→ Waits until network activity becomes idle.
+
+This is useful when products are loaded dynamically after login.
+
+
+--------------------------------
+10. WAIT FOR PRODUCTS
+--------------------------------
+
+await page.locator('.card-body b').first().waitFor();
+
+→ Waits for the first product name element to appear.
+
+This helps ensure that product elements have started loading before we work with them.
+
+
+--------------------------------
+11. GET ALL PRODUCT TEXT
+--------------------------------
+
+const allProducts = await products.allTextContents();
+
+.allTextContents()
+→ Gets the text content from all matching `.card-body` elements.
+
+Example:
+
+[
+    "ZARA COAT 3 ...",
+    "ADIDAS ORIGINAL ...",
+    "IPHONE 13 ...",
+    "Samsung ..."
+]
+
+IMPORTANT:
+
+In this code, `allProducts` is not actually used later in the logic.
+
+Therefore, this line is not required for the actual product selection.
+
+It can be kept for learning/debugging purposes or removed.
+
+
+--------------------------------
+12. GET PRODUCT COUNT
+--------------------------------
+
+const count = await products.count();
+
+.count()
+→ Returns the total number of matching product cards.
+
+Example:
+
+count = 4
+
+
+--------------------------------
+13. START THE FOR LOOP
+--------------------------------
+
+for (let i = 0; i < count; ++i) {
+
+→ Loops through all product cards one by one.
+
+JavaScript uses zero-based indexing.
+
+Example:
+
+i = 0 → First product
+i = 1 → Second product
+i = 2 → Third product
+i = 3 → Fourth product
+
+
+--------------------------------
+14. SELECT PRODUCT CARD USING .nth(i)
+--------------------------------
+
+products.nth(i)
+
+→ Selects the product card at the current index.
+
+Example:
+
+products.nth(0)
+→ First product card
+
+products.nth(1)
+→ Second product card
+
+products.nth(2)
+→ Third product card
+
+
+--------------------------------
+15. FIND PRODUCT NAME INSIDE THE CARD
+--------------------------------
+
+products.nth(i).locator('b')
+
+Here:
+
+products.nth(i)
+→ Selects the complete product card.
+
+locator('b')
+→ Finds the `<b>` element containing the product name inside that card.
+
+Structure:
+
+.card-body
+    ↓
+    b
+    ↓
+    Product Name
+
+
+--------------------------------
+16. GET PRODUCT NAME USING textContent()
+--------------------------------
+
+await products.nth(i).locator('b').textContent()
+
+→ Gets the text of the product name.
+
+Example:
+
+ADIDAS ORIGINAL
+
+
+--------------------------------
+17. COMPARE THE PRODUCT NAME
+--------------------------------
+
+if (await products.nth(i).locator('b').textContent() === productName) {
+
+This compares:
+
+Actual Product Name
+        ↓
+ADIDAS ORIGINAL
+
+        ===
+
+Expected Product Name
+        ↓
+ADIDAS ORIGINAL
+
+If both are the same:
+
+true
+
+Then Playwright enters the `if` block.
+
+
+--------------------------------
+18. CLICK ADD TO CART
+--------------------------------
+
+await products.nth(i).locator("text= Add To Cart").click();
+
+This is the most important line.
+
+First:
+
+products.nth(i)
+→ Selects the matching product card.
+
+Then:
+
+locator("text= Add To Cart")
+→ Finds the Add To Cart element inside that product card.
+
+Finally:
+
+click()
+→ Clicks the Add To Cart button.
+
+
+Overall:
+
+Product Card
+     ↓
+ADIDAS ORIGINAL
+     ↓
+Add To Cart
+     ↓
+Click
+
+
+--------------------------------
+19. WHY .card-body IS USED
+--------------------------------
+
+This is the most important concept.
+
+Previous approach:
+
+const products = page.locator('.card-body b');
+
+`.card-body b`
+→ Locates only the product name element.
+
+Structure:
+
+.card-body
+     ↓
+     b
+     ↓
+Product Name
+
+
+If we then do:
+
+products.nth(i).locator("text= Add To Cart")
+
+Playwright searches for Add To Cart inside the `<b>` element.
+
+But Add To Cart is NOT inside the `<b>` element.
+
+Therefore, it will not work correctly.
+
+
+Current approach:
+
+const products = page.locator('.card-body');
+
+`.card-body`
+→ Locates the complete product card.
+
+Structure:
+
+.card-body
+    │
+    ├── b
+    │    ↓
+    │  Product Name
+    │
+    ├── Price
+    │
+    ├── Description
+    │
+    └── Add To Cart
+         ↓
+       Button
+
+
+Now:
+
+products.nth(i)
+→ Complete product card.
+
+Therefore:
+
+products.nth(i).locator('b')
+→ Product name.
+
+products.nth(i).locator("text= Add To Cart")
+→ Add To Cart button.
+
+
+--------------------------------
+20. USING break
+--------------------------------
+
+break;
+
+Once the required product is found and added to the cart:
+
+→ The loop is stopped immediately.
+
+Without break:
+
+Find product
+    ↓
+Click Add To Cart
+    ↓
+Continue checking remaining products
+
+With break:
+
+Find product
+    ↓
+Click Add To Cart
+    ↓
+STOP LOOP
+
+
+--------------------------------
+21. PAUSE THE TEST
+--------------------------------
+
+await page.pause();
+
+→ Pauses the test execution.
+
+It is useful for debugging and inspecting the current state of the page using Playwright Inspector.
+
+
+--------------------------------
+22. PARENT AND CHILD LOCATOR CONCEPT
+--------------------------------
+
+This is the main concept behind the working code.
+
+.card-body
+    ↓
+Complete Product Card
+    │
+    ├── b
+    │    ↓
+    │  Product Name
+    │
+    └── Add To Cart
+         ↓
+       Button
+
+
+We first locate the parent:
+
+products.nth(i)
+
+Then locate the child inside it:
+
+products.nth(i).locator('b')
+
+OR
+
+products.nth(i).locator("text= Add To Cart")
+
+
+EASY WAY TO REMEMBER:
+
+Find Parent
+    ↓
+Select Correct Parent using nth()
+    ↓
+Find Child inside Parent
+    ↓
+Perform Action
+
+
+--------------------------------
+23. COMPLETE EXECUTION FLOW
+--------------------------------
+
+Open E-Commerce Website
+        ↓
+Enter Email
+        ↓
+Enter Password
+        ↓
+Click Login
+        ↓
+Wait for Page
+        ↓
+Wait for Products
+        ↓
+Find Product Cards
+        ↓
+Get Product Count
+        ↓
+Start Loop
+        ↓
+Select Product Card using nth(i)
+        ↓
+Find Product Name inside Card
+        ↓
+Get Product Name using textContent()
+        ↓
+Compare with "ADIDAS ORIGINAL"
+        ↓
+If Match
+        ↓
+Find Add To Cart inside Same Card
+        ↓
+Click Add To Cart
+        ↓
+break
+        ↓
+Pause Test
+
+
+--------------------------------
+24. IMPORTANT METHODS USED
+--------------------------------
+
+page.goto()
+→ Opens the website.
+
+page.locator()
+→ Creates a locator.
+
+fill()
+→ Enters text into an input.
+
+click()
+→ Clicks an element.
+
+waitForLoadState()
+→ Waits for a page loading state.
+
+waitFor()
+→ Waits for an element.
+
+allTextContents()
+→ Gets text from all matching elements.
+
+count()
+→ Gets the number of matching elements.
+
+nth()
+→ Selects an element using its index.
+
+textContent()
+→ Gets text from an element.
+
+break
+→ Stops the loop.
+
+page.pause()
+→ Pauses the test for debugging.
+
+
+--------------------------------
+25. KEY CONCEPT TO REMEMBER
+--------------------------------
+
+The main concept is:
+
+Locate the complete product card first.
+
+        ↓
+
+Use .nth(i) to select the required product card.
+
+        ↓
+
+Locate the product name inside that card.
+
+        ↓
+
+Compare the product name.
+
+        ↓
+
+Locate Add To Cart inside the same card.
+
+        ↓
+
+Click Add To Cart.
+
+
+SHORT FORM:
+
+.card-body
+    ↓
+Parent Product Card
+    ↓
+nth(i)
+    ↓
+Specific Product
+    ↓
+locator('b')
+    ↓
+Product Name
+    ↓
+Compare
+    ↓
+locator("text= Add To Cart")
+    ↓
+Click
+
+
+FINAL TAKEAWAY:
+
+"Find the parent product card first, identify the required product inside that card, 
+and then perform the action on the element inside the same card."
+
+--------------------------------
+ASSIGNMENT — ADD PRODUCT TO CART AND VERIFY PRODUCT IN CART
+--------------------------------
+
+OBJECTIVE
+--------------------------------
+
+This test demonstrates how to:
+
+→ Login to an e-commerce website.
+→ Find a specific product.
+→ Click "Add To Cart" for that product.
+→ Locate the Cart button.
+→ Open the Cart.
+→ Wait for the Cart page/content to load.
+→ Verify that the selected product is visible in the Cart.
+→ Use an assertion to validate the result.
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+test.only('Automate e-Commerce website', async ({ page }) => {
+
+    const userName = page.locator('#userEmail');
+    const password = page.locator("#userPassword");
+    const loginBtn = page.locator('#login');
+    const products = page.locator('.card-body');
+    const productName = 'ZARA COAT 3';
+    const addToCartBtn = page.locator('[routerlink*="cart"]');
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await userName.fill('anshika@gmail.com');
+    await password.fill('Iamking@000');
+    await loginBtn.click();
+
+    await page.waitForLoadState('networkidle');
+    await page.locator('.card-body b').first().waitFor();
+
+    const count = await products.count();
+
+    for (let i = 0; i < count; ++i) {
+
+        const product = products.nth(i);
+
+        if (await product.locator('b').textContent() === productName) {
+            await product.locator("text= Add To Cart").click();
+            break;
+        }
+    }
+
+    await addToCartBtn.click();
+
+    await page.locator("div li").first().waitFor();
+
+    expect(
+        await page.locator("h3:has-text('ZARA COAT 3')").isVisible()
+    ).toBeTruthy();
+
+    await page.pause();
+
+});
+
+
+--------------------------------
+NEW CONCEPTS ADDED IN THIS CODE
+--------------------------------
+
+The main new concepts are:
+
+1. Locating the Cart button
+2. Using `*` in an attribute selector
+3. Clicking the Cart
+4. Waiting for Cart content
+5. Using `:has-text()`
+6. Using `isVisible()`
+7. Using `expect()` with `toBeTruthy()`
+8. Verifying that the selected product is present in the Cart
+
+
+--------------------------------
+1. LOCATING THE CART BUTTON
+--------------------------------
+
+const addToCartBtn = page.locator('[routerlink*="cart"]');
+
+This creates a locator for the Cart button/link.
+
+The locator is based on the `routerlink` attribute.
+
+
+--------------------------------
+2. UNDERSTANDING [routerlink*="cart"]
+--------------------------------
+
+The locator is:
+
+[routerlink*="cart"]
+
+
+Here:
+
+[attribute]
+→ Locate an element based on an attribute.
+
+
+routerlink
+→ The attribute we are checking.
+
+
+*
+→ Means "contains" in a CSS attribute selector.
+
+
+"cart"
+→ The value we are looking for.
+
+
+Therefore:
+
+[routerlink*="cart"]
+
+means:
+
+Find an element whose `routerlink` attribute contains the text "cart".
+
+
+Example:
+
+routerlink="/dashboard/cart"
+
+Because:
+
+"/dashboard/cart"
+
+contains:
+
+"cart"
+
+the locator matches that element.
+
+
+--------------------------------
+3. WHY USE * HERE?
+--------------------------------
+
+Without `*`:
+
+[routerlink="cart"]
+
+means:
+
+The complete attribute value must be exactly:
+
+cart
+
+
+With `*`:
+
+[routerlink*="cart"]
+
+means:
+
+The attribute value can contain "cart" anywhere.
+
+
+Example:
+
+routerlink="/dashboard/cart"
+
+→ Matches `[routerlink*="cart"]`
+
+
+EASY WAY TO REMEMBER:
+
+[attribute="value"]
+→ Exact match
+
+
+[attribute*="value"]
+→ Contains value
+
+
+--------------------------------
+4. CLICK THE CART BUTTON
+--------------------------------
+
+await addToCartBtn.click();
+
+The locator:
+
+addToCartBtn
+
+represents the Cart button/link.
+
+`.click()`
+
+→ Clicks the Cart button.
+
+Execution:
+
+Product added to Cart
+        ↓
+Click Cart
+        ↓
+Open Cart page
+
+
+--------------------------------
+5. WAIT FOR CART CONTENT
+--------------------------------
+
+await page.locator("div li").first().waitFor();
+
+This waits for the first matching:
+
+div li
+
+element to appear.
+
+The purpose is to make sure that the Cart content has loaded before we try to verify the product.
+
+
+In simple terms:
+
+Open Cart
+    ↓
+Wait for Cart content
+    ↓
+Verify product
+
+
+--------------------------------
+6. UNDERSTANDING "div li"
+--------------------------------
+
+div li
+
+means:
+
+Find an `<li>` element inside a `<div>`.
+
+The space between:
+
+div
+and
+li
+
+means descendant.
+
+So:
+
+div li
+
+means:
+
+Find an `<li>` anywhere inside a `<div>`.
+
+
+It does NOT have to be a direct child.
+
+
+--------------------------------
+7. USING .first()
+--------------------------------
+
+page.locator("div li").first()
+
+If multiple `div li` elements are present:
+
+div li
+   ↓
+Multiple matching elements
+
+.first()
+   ↓
+Selects the first matching element.
+
+
+Then:
+
+.waitFor()
+
+waits for that first element.
+
+
+--------------------------------
+8. VERIFY THE PRODUCT IN THE CART
+--------------------------------
+
+expect(
+    await page.locator("h3:has-text('ZARA COAT 3')").isVisible()
+).toBeTruthy();
+
+
+This line verifies that:
+
+"ZARA COAT 3"
+
+is visible in the Cart.
+
+
+--------------------------------
+9. UNDERSTANDING :has-text()
+--------------------------------
+
+The locator is:
+
+h3:has-text('ZARA COAT 3')
+
+
+`h3`
+→ Looks for an `<h3>` element.
+
+
+`:has-text()`
+→ Filters the element based on the text it contains.
+
+
+'ZARA COAT 3'
+→ The text we are looking for.
+
+
+So:
+
+h3:has-text('ZARA COAT 3')
+
+means:
+
+Find an `<h3>` element that contains the text:
+
+ZARA COAT 3
+
+
+--------------------------------
+10. UNDERSTANDING isVisible()
+--------------------------------
+
+.isVisible()
+
+→ Checks whether the located element is currently visible on the page.
+
+Example:
+
+await page.locator("h3:has-text('ZARA COAT 3')").isVisible();
+
+
+Possible result:
+
+true
+→ Element is visible.
+
+
+false
+→ Element is not visible.
+
+
+So:
+
+isVisible()
+
+returns a Boolean value:
+
+true / false
+
+
+--------------------------------
+11. UNDERSTANDING expect()
+--------------------------------
+
+expect()
+
+→ Used to perform an assertion/verification.
+
+Example:
+
+expect(value).toBeTruthy();
+
+
+The purpose is to verify that the result is truthy.
+
+
+--------------------------------
+12. UNDERSTANDING toBeTruthy()
+--------------------------------
+
+.toBeTruthy()
+
+→ Verifies that the value is truthy.
+
+In this code:
+
+isVisible()
+    ↓
+true / false
+
+
+Then:
+
+toBeTruthy()
+
+checks whether the result is true/truthy.
+
+
+So:
+
+expect(
+    await page.locator("h3:has-text('ZARA COAT 3')").isVisible()
+).toBeTruthy();
+
+
+means:
+
+"Verify that ZARA COAT 3 is visible."
+
+
+If it is visible:
+
+true
+    ↓
+Assertion passes
+
+
+If it is not visible:
+
+false
+    ↓
+Assertion fails
+
+
+--------------------------------
+13. COMPLETE ASSERTION FLOW
+--------------------------------
+
+expect(
+    await page.locator("h3:has-text('ZARA COAT 3')").isVisible()
+).toBeTruthy();
+
+
+Execution happens like this:
+
+Locate ZARA COAT 3
+        ↓
+Check if it is visible
+        ↓
+isVisible()
+        ↓
+true / false
+        ↓
+expect()
+        ↓
+toBeTruthy()
+        ↓
+Verify result
+
+
+--------------------------------
+14. WHY ARE WE USING isVisible()?
+--------------------------------
+
+We want to verify that the product is actually displayed in the Cart.
+
+So:
+
+locator()
+    ↓
+Find product
+
+isVisible()
+    ↓
+Check visibility
+
+expect()
+    ↓
+Verify result
+
+
+--------------------------------
+15. COMPLETE TEST FLOW
+--------------------------------
+
+Open E-Commerce Website
+        ↓
+Login
+        ↓
+Wait for Products
+        ↓
+Get Product Count
+        ↓
+Loop Through Product Cards
+        ↓
+Find "ZARA COAT 3"
+        ↓
+Select Matching Product Card
+        ↓
+Click "Add To Cart"
+        ↓
+Click Cart
+        ↓
+Wait for Cart Content
+        ↓
+Find "ZARA COAT 3"
+        ↓
+Check Visibility
+        ↓
+Assertion
+        ↓
+Verify Product is in Cart
+        ↓
+Pause Test
+
+
+--------------------------------
+16. NEW METHODS / CONCEPTS
+--------------------------------
+
+[routerlink*="cart"]
+→ CSS attribute selector.
+→ `*` means the attribute contains the specified value.
+
+
+click()
+→ Clicks the Cart button.
+
+
+div li
+→ Finds `<li>` elements inside `<div>` elements.
+
+
+.first()
+→ Selects the first matching element.
+
+
+waitFor()
+→ Waits for the element to be available.
+
+
+:has-text()
+→ Locates an element based on the text it contains.
+
+
+isVisible()
+→ Checks whether an element is visible.
+→ Returns true or false.
+
+
+expect()
+→ Used for assertions.
+
+
+toBeTruthy()
+→ Verifies that the result is truthy.
+
+
+--------------------------------
+17. EASY WAY TO REMEMBER
+--------------------------------
+
+LOCATE
+    ↓
+[routerlink*="cart"]
+
+CLICK
+    ↓
+addToCartBtn.click()
+
+WAIT
+    ↓
+div li → first() → waitFor()
+
+LOCATE PRODUCT
+    ↓
+h3:has-text('ZARA COAT 3')
+
+CHECK VISIBILITY
+    ↓
+isVisible()
+
+VERIFY
+    ↓
+expect() → toBeTruthy()
+
+
+--------------------------------
+18. KEY TAKEAWAY
+--------------------------------
+
+The new part of this assignment is not just adding the product to the Cart.
+
+We are now also VERIFYING the result.
+
+Product
+    ↓
+Add To Cart
+    ↓
+Open Cart
+    ↓
+Find Product
+    ↓
+Check Visibility
+    ↓
+Assertion
+    ↓
+PASS / FAIL
+
+
+IMPORTANT:
+
+Adding a product to the Cart is the ACTION.
+
+Checking that the product is visible in the Cart is the VALIDATION.
+
+
+ACTION
+→ click()
+
+VALIDATION
+→ expect() + isVisible() + toBeTruthy()
+
+
+--------------------------------
+ASSIGNMENT — SELECTING COUNTRY FROM AUTO-SUGGEST DROPDOWN
+--------------------------------
+
+NEW CONCEPTS ADDED
+--------------------------------
+
+This code introduces the following new Playwright concepts:
+
+→ Clicking Checkout
+→ `pressSequentially()`
+→ Typing with a delay
+→ Locating an auto-suggestion dropdown
+→ `waitFor()`
+→ Getting the number of dropdown options using `count()`
+→ Looping through dropdown options
+→ Reading option text using `textContent()`
+→ Selecting a specific option using `.nth()`
+→ Clicking the matching option
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+test.only('Automate e-Commerce website', async ({ page }) => {
+
+    const userName = page.locator('#userEmail');
+    const password = page.locator("#userPassword");
+    const loginBtn = page.locator('#login');
+    const products = page.locator('.card-body');
+    const productName = 'ZARA COAT 3';
+    const addToCartBtn = page.locator('[routerlink*="cart"]');
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await userName.fill('anshika@gmail.com');
+    await password.fill('Iamking@000');
+    await loginBtn.click();
+
+    await page.waitForLoadState('networkidle');
+    await page.locator('.card-body b').first().waitFor();
+
+    const count = await products.count();
+
+    for (let i = 0; i < count; ++i) {
+
+        const product = products.nth(i);
+
+        if (await product.locator('b').textContent() === productName) {
+            await product.locator("text= Add To Cart").click();
+            break;
+        }
+    }
+
+    await addToCartBtn.click();
+
+    await page.locator("div li").first().waitFor();
+
+    expect(
+        await page.locator("h3:has-text('ZARA COAT 3')").isVisible()
+    ).toBeTruthy();
+
+    await page.locator("text=Checkout").click();
+
+    await page.locator("[placeholder*='Select Country']")
+        .pressSequentially("ind", { delay: 100 });
+
+    const dropdown = page.locator(".ta-results");
+
+    await dropdown.waitFor();
+
+    const optionsCount = await dropdown.locator("button").count();
+
+    for (let i = 0; i < optionsCount; ++i) {
+
+        const text = await dropdown.locator("button").nth(i).textContent();
+
+        if (text === " India") {
+            await dropdown.locator("button").nth(i).click();
+            break;
+        }
+    }
+
+    await page.pause();
+
+});
+
+
+--------------------------------
+1. CLICK CHECKOUT
+--------------------------------
+
+await page.locator("text=Checkout").click();
+
+→ Locates the Checkout element using its text.
+
+→ Clicks the Checkout button.
+
+Flow:
+
+Cart
+  ↓
+Checkout
+  ↓
+Checkout / Payment Page
+
+
+--------------------------------
+2. LOCATE COUNTRY INPUT FIELD
+--------------------------------
+
+await page.locator("[placeholder*='Select Country']")
+
+The locator is:
+
+[placeholder*='Select Country']
+
+
+`placeholder`
+→ The HTML attribute being checked.
+
+`*`
+→ Means "contains" in a CSS attribute selector.
+
+`'Select Country'`
+→ The text we are looking for inside the placeholder attribute.
+
+So:
+
+[placeholder*='Select Country']
+
+means:
+
+Find an element whose `placeholder` attribute contains:
+
+Select Country
+
+
+Example:
+
+placeholder="Select Country"
+
+or:
+
+placeholder="Select Country"
+
+Both would match because the attribute contains "Select Country".
+
+
+--------------------------------
+3. pressSequentially()
+--------------------------------
+
+await page.locator("[placeholder*='Select Country']")
+    .pressSequentially("ind", { delay: 100 });
+
+
+`pressSequentially()`
+
+→ Types the given text into the element one character at a time.
+
+Here:
+
+"ind"
+
+is typed as:
+
+i
+↓
+n
+↓
+d
+
+
+The delay is:
+
+100 milliseconds
+
+So approximately:
+
+i → wait 100 ms
+n → wait 100 ms
+d → wait 100 ms
+
+
+--------------------------------
+4. pressSequentially() vs fill()
+--------------------------------
+
+fill():
+
+await locator.fill("ind");
+
+→ Enters the complete text directly.
+
+
+pressSequentially():
+
+await locator.pressSequentially("ind");
+
+→ Types the characters sequentially.
+
+In this example, `pressSequentially()` is useful because the country field is an auto-suggestion field.
+
+As we type:
+
+i
+↓
+in
+↓
+ind
+↓
+Suggestions appear
+
+
+--------------------------------
+5. UNDERSTANDING { delay: 100 }
+--------------------------------
+
+{ delay: 100 }
+
+→ Adds a 100 millisecond delay between each key press.
+
+Example:
+
+.pressSequentially("ind", { delay: 100 })
+
+
+Means:
+
+Type "i"
+    ↓
+Wait 100 ms
+    ↓
+Type "n"
+    ↓
+Wait 100 ms
+    ↓
+Type "d"
+
+
+--------------------------------
+6. CREATE DROPDOWN LOCATOR
+--------------------------------
+
+const dropdown = page.locator(".ta-results");
+
+→ Creates a locator for the auto-suggestion dropdown.
+
+`.ta-results`
+
+→ Represents the container that contains the country suggestions.
+
+
+Conceptually:
+
+Country Input
+     ↓
+Type "ind"
+     ↓
+Auto-Suggestion Dropdown
+     ↓
+India
+Indonesia
+...
+
+
+--------------------------------
+7. WAIT FOR DROPDOWN
+--------------------------------
+
+await dropdown.waitFor();
+
+→ Waits for the dropdown element to appear.
+
+This is important because the dropdown is displayed dynamically after typing.
+
+Flow:
+
+Type "ind"
+     ↓
+Wait
+     ↓
+Dropdown appears
+     ↓
+Continue execution
+
+
+--------------------------------
+8. COUNT DROPDOWN OPTIONS
+--------------------------------
+
+const optionsCount = await dropdown.locator("button").count();
+
+First:
+
+dropdown
+    ↓
+.ta-results
+
+Then:
+
+locator("button")
+    ↓
+Find all buttons inside the dropdown.
+
+Finally:
+
+.count()
+    ↓
+Get the number of buttons/options.
+
+
+For example:
+
+India
+Indonesia
+Indiana
+
+If there are 3 buttons:
+
+optionsCount = 3
+
+
+--------------------------------
+9. LOOP THROUGH DROPDOWN OPTIONS
+--------------------------------
+
+for (let i = 0; i < optionsCount; ++i) {
+
+→ Loops through every country option.
+
+Because Playwright uses zero-based indexing:
+
+i = 0 → First option
+i = 1 → Second option
+i = 2 → Third option
+
+
+--------------------------------
+10. GET TEXT OF EACH OPTION
+--------------------------------
+
+const text = await dropdown.locator("button").nth(i).textContent();
+
+This line does three things:
+
+1. `dropdown.locator("button")`
+
+→ Finds all buttons inside the dropdown.
+
+
+2. `.nth(i)`
+
+→ Selects the button at the current index.
+
+
+3. `.textContent()`
+
+→ Gets the text of that button.
+
+
+Example:
+
+i = 0
+    ↓
+First button
+    ↓
+"India"
+
+
+i = 1
+    ↓
+Second button
+    ↓
+"Indonesia"
+
+
+--------------------------------
+11. COMPARE OPTION WITH REQUIRED COUNTRY
+--------------------------------
+
+if (text === " India") {
+
+→ Compares the current option text with:
+
+" India"
+
+Notice the space before `India`.
+
+The actual text returned by `textContent()` may contain a leading space.
+
+For example:
+
+text = " India"
+
+Therefore:
+
+if (text === " India")
+
+checks whether the current option is India.
+
+
+--------------------------------
+12. CLICK THE MATCHING COUNTRY
+--------------------------------
+
+await dropdown.locator("button").nth(i).click();
+
+→ Selects the current dropdown option and clicks it.
+
+Because the code is inside:
+
+if (text === " India")
+
+the click happens only when the current option is India.
+
+
+Flow:
+
+Find option
+    ↓
+Get text
+    ↓
+Compare with " India"
+    ↓
+Match?
+    ↓
+YES
+    ↓
+Click India
+
+
+--------------------------------
+13. break
+--------------------------------
+
+break;
+
+After clicking India:
+
+→ Stops the loop.
+
+Without `break`:
+
+India is found
+    ↓
+Click India
+    ↓
+Continue checking remaining options
+
+With `break`:
+
+India is found
+    ↓
+Click India
+    ↓
+STOP LOOP
+
+
+--------------------------------
+14. COMPLETE DROPDOWN FLOW
+--------------------------------
+
+Click Checkout
+      ↓
+Country field appears
+      ↓
+Type "ind"
+      ↓
+Auto-suggestions appear
+      ↓
+Locate dropdown
+      ↓
+Wait for dropdown
+      ↓
+Find all buttons
+      ↓
+Get option count
+      ↓
+Loop through options
+      ↓
+Get option text
+      ↓
+Compare with " India"
+      ↓
+Match found
+      ↓
+Click India
+      ↓
+break
+
+
+--------------------------------
+15. IMPORTANT CONCEPT — DYNAMIC DROPDOWN
+--------------------------------
+
+This is an example of a dynamic/auto-suggestion dropdown.
+
+It is different from a normal HTML `<select>` dropdown.
+
+Normal dropdown:
+
+<select>
+    <option>India</option>
+    <option>USA</option>
+</select>
+
+Can often be handled using:
+
+selectOption()
+
+
+Auto-suggestion dropdown:
+
+Type country
+     ↓
+Suggestions dynamically appear
+     ↓
+Find required suggestion
+     ↓
+Click suggestion
+
+
+For this type of dropdown, we can locate the options and click the required one.
+
+
+--------------------------------
+16. KEY METHODS USED
+--------------------------------
+
+click()
+→ Clicks an element.
+
+pressSequentially()
+→ Types text one character at a time.
+
+delay
+→ Adds a delay between key presses.
+
+waitFor()
+→ Waits for an element.
+
+count()
+→ Returns the number of matching elements.
+
+nth()
+→ Selects an element using its index.
+
+textContent()
+→ Gets text from an element.
+
+break
+→ Stops the loop.
+
+
+--------------------------------
+17. EASY WAY TO REMEMBER
+--------------------------------
+
+TYPE
+    ↓
+pressSequentially("ind")
+
+WAIT
+    ↓
+dropdown.waitFor()
+
+COUNT
+    ↓
+dropdown.locator("button").count()
+
+LOOP
+    ↓
+for(...)
+
+GET TEXT
+    ↓
+textContent()
+
+COMPARE
+    ↓
+text === " India"
+
+CLICK
+    ↓
+nth(i).click()
+
+STOP
+    ↓
+break
+
+
+--------------------------------
+18. KEY TAKEAWAY
+--------------------------------
+
+For a dynamic country dropdown:
+
+Type the country name
+        ↓
+Wait for suggestions
+        ↓
+Count the options
+        ↓
+Loop through options
+        ↓
+Read each option text
+        ↓
+Compare with required country
+        ↓
+Click matching option
+        ↓
+Break the loop
+
+
+--------------------------------
+ASSIGNMENT — COMPLETE ORDER PLACEMENT AND ORDER CONFIRMATION
+--------------------------------
+
+NEW CONCEPTS ADDED IN THIS CODE
+--------------------------------
+
+The new concepts added are:
+
+→ Storing email in a variable
+→ Reusing a variable in `fill()`
+→ Verifying email using `toHaveText()`
+→ Clicking the Order Submit button
+→ Creating a locator for the confirmation message
+→ Verifying confirmation message using `expect()`
+→ Extracting Order ID using `textContent()`
+→ Printing Order ID and confirmation message using `console.log()`
+
+
+--------------------------------
+1. STORE EMAIL IN A VARIABLE
+--------------------------------
+
+const email = "anshika@gmail.com";
+
+Instead of directly writing the email inside:
+
+await userName.fill('anshika@gmail.com');
+
+we store it in a variable:
+
+email
+   ↓
+"anshika@gmail.com"
+
+
+This allows us to reuse the same email later in the test.
+
+
+--------------------------------
+2. USE EMAIL VARIABLE IN fill()
+--------------------------------
+
+await userName.fill(email);
+
+Here:
+
+email
+   ↓
+"anshika@gmail.com"
+
+So Playwright enters:
+
+anshika@gmail.com
+
+into the username/email field.
+
+
+Previously:
+
+await userName.fill('anshika@gmail.com');
+
+Now:
+
+await userName.fill(email);
+
+
+ADVANTAGE:
+
+If the email needs to be changed, we only need to change it in one place:
+
+const email = "newemail@gmail.com";
+
+
+--------------------------------
+3. VERIFY EMAIL USING toHaveText()
+--------------------------------
+
+expect(await page.locator(".user__name [type='text']").first())
+    .toHaveText(email);
+
+
+This verifies that the email displayed on the page matches the email stored in the `email` variable.
+
+
+The locator:
+
+.user__name [type='text']
+
+means:
+
+Find an element with:
+
+class = user__name
+
+and inside it find an element whose:
+
+type = text
+
+
+Then:
+
+.first()
+
+→ Selects the first matching element.
+
+
+Then:
+
+toHaveText(email)
+
+→ Verifies that the element contains the expected text stored in `email`.
+
+
+Overall:
+
+Find email element
+      ↓
+Get displayed text
+      ↓
+Compare with email variable
+      ↓
+Verification
+
+
+--------------------------------
+4. toHaveText()
+--------------------------------
+
+toHaveText()
+
+→ Used to verify that an element contains the expected text.
+
+
+Example:
+
+await expect(locator).toHaveText("Hello");
+
+
+means:
+
+Verify that the located element contains:
+
+Hello
+
+
+In our code:
+
+await expect(
+    page.locator(".user__name [type='text']").first()
+).toHaveText(email);
+
+
+means:
+
+Verify that the email displayed on the page matches:
+
+email
+
+
+--------------------------------
+5. CLICK ORDER SUBMIT
+--------------------------------
+
+await page.locator(".action__submit").click();
+
+
+`.action__submit`
+
+→ Locates the button used to submit/place the order.
+
+
+`.click()`
+
+→ Clicks the button.
+
+
+Flow:
+
+Select Country
+      ↓
+Verify Email
+      ↓
+Click Order Submit
+      ↓
+Order is placed
+
+
+--------------------------------
+6. CREATE CONFIRMATION MESSAGE LOCATOR
+--------------------------------
+
+const confirmationMsg = page.locator(".hero-primary");
+
+
+This creates a reusable locator for the order confirmation message.
+
+
+Instead of writing:
+
+page.locator(".hero-primary")
+
+multiple times, we store it:
+
+confirmationMsg
+
+
+Now we can use:
+
+confirmationMsg
+
+
+--------------------------------
+7. VERIFY ORDER CONFIRMATION MESSAGE
+--------------------------------
+
+await expect(confirmationMsg)
+    .toHaveText(" Thankyou for the order. ");
+
+
+This verifies that the confirmation message displayed after placing the order is:
+
+Thankyou for the order.
+
+
+Flow:
+
+Click Submit
+     ↓
+Order placed
+     ↓
+Confirmation message appears
+     ↓
+Verify message
+
+
+--------------------------------
+8. WHY USE toHaveText()?
+--------------------------------
+
+We want to verify the actual text displayed by the confirmation message.
+
+Expected:
+
+Thankyou for the order.
+
+
+So:
+
+await expect(confirmationMsg)
+    .toHaveText(" Thankyou for the order. ");
+
+
+If the actual text matches:
+
+→ Assertion passes.
+
+
+If the text is different:
+
+→ Assertion fails.
+
+
+--------------------------------
+9. EXTRACT ORDER ID
+--------------------------------
+
+const orderId =
+    await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
+
+
+This retrieves the text of the Order ID displayed on the confirmation page.
+
+
+`.em-spacer-1`
+
+→ Locates the parent/container element.
+
+
+`.ng-star-inserted`
+
+→ Locates the element containing the Order ID inside it.
+
+
+`.textContent()`
+
+→ Gets the text from that element.
+
+
+The returned value is stored in:
+
+orderId
+
+
+For example:
+
+orderId
+   ↓
+"| 1234567890 |"
+
+
+The exact value depends on the order created during the test.
+
+
+--------------------------------
+10. textContent() FOR ORDER ID
+--------------------------------
+
+textContent()
+
+→ Gets the text content from an element.
+
+
+Example:
+
+const orderId =
+    await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
+
+
+The extracted text is stored in:
+
+orderId
+
+
+So:
+
+Page
+ ↓
+Order ID element
+ ↓
+textContent()
+ ↓
+orderId variable
+
+
+--------------------------------
+11. PRINT ORDER ID
+--------------------------------
+
+console.log(orderId);
+
+
+→ Prints the extracted Order ID in the console.
+
+
+Example:
+
+1234567890
+
+
+This is useful for debugging or checking the generated order number.
+
+
+--------------------------------
+12. PRINT CONFIRMATION MESSAGE
+--------------------------------
+
+console.log(await confirmationMsg.textContent());
+
+
+Here:
+
+confirmationMsg
+     ↓
+Locator for confirmation message
+
+textContent()
+     ↓
+Gets the text
+
+console.log()
+     ↓
+Prints the text in the console.
+
+
+Example output:
+
+Thankyou for the order.
+
+
+--------------------------------
+13. toHaveText() vs textContent()
+--------------------------------
+
+toHaveText()
+
+→ Used for VERIFICATION / ASSERTION.
+
+
+Example:
+
+await expect(confirmationMsg)
+    .toHaveText(" Thankyou for the order. ");
+
+
+Purpose:
+
+"Verify that the text is correct."
+
+
+--------------------------------
+
+textContent()
+
+→ Used to GET / EXTRACT the text.
+
+
+Example:
+
+const orderId =
+    await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
+
+
+Purpose:
+
+"Get the text so that I can store or use it."
+
+
+--------------------------------
+EASY WAY TO REMEMBER
+--------------------------------
+
+toHaveText()
+     ↓
+VERIFY TEXT
+
+textContent()
+     ↓
+GET TEXT
+
+
+--------------------------------
+14. COMPLETE NEW FLOW
+--------------------------------
+
+Store Email
+     ↓
+Use Email for Login
+     ↓
+Add Product to Cart
+     ↓
+Open Cart
+     ↓
+Verify Product
+     ↓
+Checkout
+     ↓
+Select Country
+     ↓
+Verify Email
+     ↓
+Submit Order
+     ↓
+Confirmation Message
+     ↓
+Verify Confirmation Message
+     ↓
+Extract Order ID
+     ↓
+Print Order ID
+     ↓
+Print Confirmation Message
+
+
+--------------------------------
+15. COMPLETE EXECUTION FLOW
+--------------------------------
+
+Login
+  ↓
+Find "ZARA COAT 3"
+  ↓
+Add To Cart
+  ↓
+Open Cart
+  ↓
+Verify Product
+  ↓
+Checkout
+  ↓
+Enter Country
+  ↓
+Select India
+  ↓
+Verify Email
+  ↓
+Click Submit
+  ↓
+Order Placed
+  ↓
+Verify "Thankyou for the order."
+  ↓
+Extract Order ID
+  ↓
+Print Order ID
+  ↓
+Print Confirmation Message
+
+
+--------------------------------
+16. METHODS / CONCEPTS ADDED
+--------------------------------
+
+const email = "..."
+→ Stores email in a reusable variable.
+
+fill(email)
+→ Uses the variable as input.
+
+first()
+→ Selects the first matching element.
+
+toHaveText()
+→ Verifies the text of an element.
+
+click()
+→ Clicks an element.
+
+textContent()
+→ Extracts text from an element.
+
+console.log()
+→ Prints data in the console.
+
+
+--------------------------------
+17. KEY DIFFERENCE
+--------------------------------
+
+VERIFYING DATA:
+
+await expect(locator).toHaveText(expectedText);
+
+
+EXTRACTING DATA:
+
+const value = await locator.textContent();
+
+
+PRINTING DATA:
+
+console.log(value);
+
+
+So:
+
+toHaveText()
+→ Verify
+
+
+textContent()
+→ Extract
+
+
+console.log()
+→ Print
+
+
+--------------------------------
+18. KEY TAKEAWAY
+--------------------------------
+
+The new part of this assignment is completing the complete e-commerce flow:
+
+LOGIN
+   ↓
+SELECT PRODUCT
+   ↓
+ADD TO CART
+   ↓
+VERIFY PRODUCT
+   ↓
+CHECKOUT
+   ↓
+SELECT COUNTRY
+   ↓
+VERIFY EMAIL
+   ↓
+PLACE ORDER
+   ↓
+VERIFY CONFIRMATION
+   ↓
+EXTRACT ORDER ID
+   ↓
+PRINT ORDER DETAILS
+
+
+The test is now not only performing actions, but also validating
+important results using Playwright assertions.
+
+
+--------------------------------
+ASSIGNMENT — VERIFYING ORDER DETAILS FROM MY ORDERS
+--------------------------------
+
+NEW CONCEPTS ADDED IN THIS CODE
+--------------------------------
+
+The new concepts added are:
+
+→ Clicking "My Orders"
+→ Waiting for a table
+→ Locating table rows using `tbody tr`
+→ Getting the number of rows using `count()`
+→ Looping through table rows
+→ Extracting Order ID from each row
+→ Using `includes()` to compare Order IDs
+→ Clicking a button inside the matching row
+→ Extracting Order ID from the Order Details page
+→ Comparing Order IDs using an assertion
+
+
+--------------------------------
+COMPLETE NEW CODE
+--------------------------------
+
+await page.locator("button[routerlink*='myorders']").click();
+
+await page.locator("tbody").waitFor();
+
+const rows = page.locator("tbody tr");
+const rowCount = await rows.count();
+
+for (let i = 0; i < rowCount; ++i) {
+
+    const rowOrderId = await rows.nth(i).locator("th").textContent();
+
+    if (orderId.includes(rowOrderId)) {
+        await rows.nth(i).locator("button").first().click();
+        break;
+    }
+}
+
+const orderIdDetails = await page.locator(".col-text").textContent();
+
+expect(orderId.includes(orderIdDetails)).toBeTruthy();
+
+
+--------------------------------
+1. CLICK "MY ORDERS"
+--------------------------------
+
+await page.locator("button[routerlink*='myorders']").click();
+
+
+This locator:
+
+button[routerlink*='myorders']
+
+
+means:
+
+Find a `<button>` element whose `routerlink` attribute contains:
+
+myorders
+
+
+Here:
+
+button
+→ Element type.
+
+
+routerlink
+→ Attribute.
+
+
+*
+→ Contains.
+
+
+'myorders'
+→ Value we are looking for.
+
+
+So:
+
+button[routerlink*='myorders']
+
+means:
+
+Find a button whose routerlink contains "myorders".
+
+
+Then:
+
+.click()
+
+→ Clicks the My Orders button.
+
+
+Flow:
+
+Order Placed
+    ↓
+Click My Orders
+    ↓
+My Orders page opens
+
+
+--------------------------------
+2. WAIT FOR THE ORDERS TABLE
+--------------------------------
+
+await page.locator("tbody").waitFor();
+
+
+`tbody`
+
+→ Represents the body section of an HTML table.
+
+
+The test waits for the `<tbody>` element to appear.
+
+
+Why?
+
+The order table may load dynamically after navigating to My Orders.
+
+
+Flow:
+
+Open My Orders
+      ↓
+Wait for tbody
+      ↓
+Orders table is available
+      ↓
+Continue test
+
+
+--------------------------------
+3. LOCATE ALL TABLE ROWS
+--------------------------------
+
+const rows = page.locator("tbody tr");
+
+
+This locator means:
+
+Find all `<tr>` elements inside `<tbody>`.
+
+
+Structure:
+
+<table>
+    <thead>
+        ...
+    </thead>
+
+    <tbody>
+        <tr>  ← Row 1
+        <tr>  ← Row 2
+        <tr>  ← Row 3
+    </tbody>
+</table>
+
+
+So:
+
+tbody tr
+
+→ Locates all order rows in the table.
+
+
+--------------------------------
+4. GET NUMBER OF ROWS
+--------------------------------
+
+const rowCount = await rows.count();
+
+
+`.count()`
+
+→ Returns the number of matching rows.
+
+
+For example:
+
+tbody tr
+    ↓
+5 rows
+
+rowCount = 5
+
+
+This count is then used to control the loop.
+
+
+--------------------------------
+5. LOOP THROUGH ALL ORDER ROWS
+--------------------------------
+
+for (let i = 0; i < rowCount; ++i) {
+
+
+The loop checks each order row one by one.
+
+
+Because indexing starts from 0:
+
+i = 0
+→ First row
+
+i = 1
+→ Second row
+
+i = 2
+→ Third row
+
+...
+
+
+--------------------------------
+6. GET ORDER ID FROM EACH ROW
+--------------------------------
+
+const rowOrderId =
+    await rows.nth(i).locator("th").textContent();
+
+
+This line performs several operations.
+
+
+First:
+
+rows.nth(i)
+
+→ Selects the current table row.
+
+
+Then:
+
+.locator("th")
+
+→ Finds the `<th>` element inside that row.
+
+
+Then:
+
+.textContent()
+
+→ Gets the text from the `<th>`.
+
+
+The result is stored in:
+
+rowOrderId
+
+
+So:
+
+Current Row
+    ↓
+th
+    ↓
+Order ID
+    ↓
+textContent()
+    ↓
+rowOrderId
+
+
+--------------------------------
+7. UNDERSTANDING nth(i) HERE
+--------------------------------
+
+rows.nth(i)
+
+
+The `i` value changes during the loop.
+
+
+Example:
+
+i = 0
+
+rows.nth(0)
+→ First order row
+
+
+i = 1
+
+rows.nth(1)
+→ Second order row
+
+
+i = 2
+
+rows.nth(2)
+→ Third order row
+
+
+This allows us to inspect every order individually.
+
+
+--------------------------------
+8. COMPARE ORDER IDs USING includes()
+--------------------------------
+
+if (orderId.includes(rowOrderId)) {
+
+
+This is the main new JavaScript concept.
+
+
+`includes()`
+
+→ Checks whether one string contains another string.
+
+
+Example:
+
+const orderId = " 1234567890 ";
+
+orderId.includes("1234567890");
+
+
+Result:
+
+true
+
+
+If the value is not present:
+
+false
+
+
+--------------------------------
+9. WHY USE includes()?
+--------------------------------
+
+The Order ID extracted earlier may contain additional characters or spaces.
+
+For example:
+
+orderId:
+
+"| 1234567890 |"
+
+
+While the table may contain:
+
+rowOrderId:
+
+"1234567890"
+
+
+If we use:
+
+orderId === rowOrderId
+
+it may return:
+
+false
+
+
+because the strings are not exactly the same.
+
+
+Using:
+
+orderId.includes(rowOrderId)
+
+checks whether the row Order ID exists inside the extracted Order ID.
+
+
+Therefore:
+
+"| 1234567890 |"
+        ↓
+contains
+        ↓
+"1234567890"
+
+Result:
+
+true
+
+
+--------------------------------
+10. CLICK BUTTON INSIDE MATCHING ROW
+--------------------------------
+
+await rows.nth(i).locator("button").first().click();
+
+
+Once the correct Order ID is found:
+
+rows.nth(i)
+
+→ Selects the matching order row.
+
+
+.locator("button")
+
+→ Finds the button inside that row.
+
+
+.first()
+
+→ Selects the first button.
+
+
+.click()
+
+→ Clicks the button.
+
+
+Flow:
+
+Find matching Order ID
+        ↓
+Select that row
+        ↓
+Find button inside row
+        ↓
+Select first button
+        ↓
+Click
+
+
+--------------------------------
+11. WHY USE .first()?
+--------------------------------
+
+There may be one or more buttons inside the row.
+
+Using:
+
+.first()
+
+ensures that the first matching button is selected.
+
+
+So:
+
+rows.nth(i).locator("button").first()
+
+
+means:
+
+Find buttons inside the current row and select the first one.
+
+
+--------------------------------
+12. break AFTER CLICK
+--------------------------------
+
+break;
+
+
+After finding the matching Order ID and clicking its button:
+
+→ Stop the loop.
+
+
+Without `break`:
+
+Find matching order
+    ↓
+Click button
+    ↓
+Continue checking remaining rows
+
+
+With `break`:
+
+Find matching order
+    ↓
+Click button
+    ↓
+STOP LOOP
+
+
+--------------------------------
+13. EXTRACT ORDER ID FROM DETAILS PAGE
+--------------------------------
+
+const orderIdDetails =
+    await page.locator(".col-text").textContent();
+
+
+After clicking the button, the Order Details page opens.
+
+
+The locator:
+
+.col-text
+
+→ Locates the element containing the Order ID on the details page.
+
+
+Then:
+
+.textContent()
+
+→ Extracts the Order ID.
+
+
+The result is stored in:
+
+orderIdDetails
+
+
+Flow:
+
+Click View Details
+       ↓
+Order Details page
+       ↓
+Locate Order ID
+       ↓
+textContent()
+       ↓
+orderIdDetails
+
+
+--------------------------------
+14. VERIFY ORDER ID
+--------------------------------
+
+expect(orderId.includes(orderIdDetails)).toBeTruthy();
+
+
+This is the final validation.
+
+
+First:
+
+orderId.includes(orderIdDetails)
+
+
+→ Checks whether the Order ID from the confirmation page contains the Order ID from the details page.
+
+
+Result:
+
+true / false
+
+
+Then:
+
+.toBeTruthy()
+
+
+→ Verifies that the result is truthy.
+
+
+So the complete statement means:
+
+"Verify that the Order ID from the order confirmation matches the Order ID shown in the order details."
+
+
+--------------------------------
+15. COMPLETE VERIFICATION FLOW
+--------------------------------
+
+Order Placed
+     ↓
+Get Order ID
+     ↓
+Open My Orders
+     ↓
+Wait for Orders Table
+     ↓
+Get All Order Rows
+     ↓
+Loop Through Rows
+     ↓
+Get Order ID from Current Row
+     ↓
+Compare with Original Order ID
+     ↓
+Match Found
+     ↓
+Click View Details
+     ↓
+Order Details Page
+     ↓
+Get Order ID
+     ↓
+Compare Order IDs
+     ↓
+Assertion
+     ↓
+PASS / FAIL
+
+
+--------------------------------
+16. IMPORTANT NEW CONCEPT — TABLE HANDLING
+--------------------------------
+
+HTML table structure:
+
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Product</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <tr>
+            <th>12345</th>
+            <td>ZARA COAT 3</td>
+            <td>
+                <button>View</button>
+            </td>
+        </tr>
+
+        <tr>
+            <th>67890</th>
+            <td>ADIDAS ORIGINAL</td>
+            <td>
+                <button>View</button>
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+
+
+Locator:
+
+tbody tr
+
+→ All rows
+
+
+Locator:
+
+rows.nth(i)
+
+→ Specific row
+
+
+Locator:
+
+rows.nth(i).locator("th")
+
+→ Order ID inside that row
+
+
+Locator:
+
+rows.nth(i).locator("button")
+
+→ Button inside that row
+
+
+--------------------------------
+17. IMPORTANT NEW CONCEPT — PARENT → CHILD
+--------------------------------
+
+The code uses parent-child locator chaining.
+
+
+tbody
+  ↓
+tr
+  ↓
+th
+
+
+And:
+
+tr
+  ↓
+button
+
+
+For example:
+
+rows.nth(i).locator("th")
+
+
+means:
+
+Select current row
+       ↓
+Find th inside that row
+
+
+And:
+
+rows.nth(i).locator("button")
+
+
+means:
+
+Select current row
+       ↓
+Find button inside that row
+
+
+This helps us perform actions on the correct row.
+
+
+--------------------------------
+18. IMPORTANT NEW CONCEPT — includes()
+--------------------------------
+
+`includes()` is a JavaScript string method.
+
+
+Purpose:
+
+→ Checks whether a string contains another string.
+
+
+Example:
+
+"Hello Playwright".includes("Playwright")
+
+Result:
+
+true
+
+
+Example:
+
+"Hello Playwright".includes("Selenium")
+
+Result:
+
+false
+
+
+In this test:
+
+orderId.includes(rowOrderId)
+
+
+means:
+
+Does the original Order ID contain the Order ID from this row?
+
+
+--------------------------------
+19. includes() vs ===
+--------------------------------
+
+===
+
+→ Checks for an exact match.
+
+
+Example:
+
+"12345" === "12345"
+
+→ true
+
+
+But:
+
+"| 12345 |" === "12345"
+
+→ false
+
+
+--------------------------------
+
+includes()
+
+→ Checks whether one string contains another string.
+
+
+"| 12345 |".includes("12345")
+
+→ true
+
+
+Therefore, `includes()` is useful here because the extracted Order ID may contain additional spaces or characters.
+
+
+--------------------------------
+20. NEW METHODS / CONCEPTS
+--------------------------------
+
+button[routerlink*='myorders']
+→ Finds the My Orders button using an attribute containing "myorders".
+
+
+waitFor()
+→ Waits for an element to appear/be available.
+
+
+tbody tr
+→ Locates table rows inside the table body.
+
+
+count()
+→ Returns the number of matching elements.
+
+
+nth(i)
+→ Selects an element at the specified index.
+
+
+th
+→ Represents a table header/data cell element used here for the Order ID.
+
+
+textContent()
+→ Gets text from an element.
+
+
+button
+→ Locates buttons.
+
+
+first()
+→ Selects the first matching element.
+
+
+includes()
+→ Checks whether one string contains another string.
+
+
+toBeTruthy()
+→ Verifies that the result is truthy.
+
+
+--------------------------------
+21. COMPLETE EXECUTION FLOW OF THE ASSIGNMENT
+--------------------------------
+
+LOGIN
+  ↓
+SELECT ZARA COAT 3
+  ↓
+ADD TO CART
+  ↓
+OPEN CART
+  ↓
+VERIFY PRODUCT
+  ↓
+CHECKOUT
+  ↓
+SELECT INDIA
+  ↓
+VERIFY EMAIL
+  ↓
+SUBMIT ORDER
+  ↓
+VERIFY CONFIRMATION
+  ↓
+GET ORDER ID
+  ↓
+OPEN MY ORDERS
+  ↓
+WAIT FOR TABLE
+  ↓
+GET ALL ORDER ROWS
+  ↓
+LOOP THROUGH ROWS
+  ↓
+GET ORDER ID FROM EACH ROW
+  ↓
+COMPARE ORDER IDs
+  ↓
+FIND MATCHING ORDER
+  ↓
+CLICK VIEW DETAILS
+  ↓
+GET ORDER ID FROM DETAILS PAGE
+  ↓
+COMPARE ORDER IDs
+  ↓
+ASSERTION
+  ↓
+PASS / FAIL
+
+
+--------------------------------
+22. KEY TAKEAWAY
+--------------------------------
+
+This part of the assignment demonstrates how to work with
+DYNAMIC TABLE DATA in Playwright.
+
+The main logic is:
+
+Find all rows
+     ↓
+Loop through rows
+     ↓
+Read Order ID from each row
+     ↓
+Compare with required Order ID
+     ↓
+Find matching row
+     ↓
+Click button inside that row
+     ↓
+Read Order ID from details page
+     ↓
+Verify Order ID
+
+
+SHORT FORM:
+
+tbody tr
+   ↓
+count()
+   ↓
+for loop
+   ↓
+nth(i)
+   ↓
+textContent()
+   ↓
+includes()
+   ↓
+button.click()
+   ↓
+textContent()
+   ↓
+expect()
+   ↓
+toBeTruthy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
