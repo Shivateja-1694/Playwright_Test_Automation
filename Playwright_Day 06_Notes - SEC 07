@@ -1,0 +1,1887 @@
+--------------------------------
+DAY 06 — 09/01 — TUESDAY
+--------------------------------
+
+--------------
+SECTION 07
+--------------
+
+--------------------------------
+PLAYWRIGHT SPECIAL LOCATORS
+--------------------------------
+
+Playwright provides special locators to locate elements using
+user-facing information such as:
+
+→ Label
+→ Placeholder
+→ Role
+→ Text
+
+In this topic, we are learning:
+
+1. getByLabel()
+2. getByPlaceholder()
+3. getByRole()
+4. getByText()
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { expect, test } from '@playwright/test';
+
+test('should locate elements using special locators', async ({ page }) => {
+
+    await page.goto('https://rahulshettyacademy.com/angularpractice/');
+
+    await page.getByLabel('Check me out').click();
+
+    await page.getByLabel('Employed').check();
+
+    await page.getByLabel('Gender').selectOption('Female');
+
+    await page.getByPlaceholder('Password').fill('password123');
+
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    await expect(
+        page.getByText('Success! The Form has been submitted successfully!.')
+    ).toBeVisible();
+
+    await page.getByRole('link', { name: 'Home' }).click();
+
+    await page.getByRole('link', { name: 'Shop' }).click();
+
+    await page.pause();
+});
+
+
+--------------------------------
+1. getByLabel()
+--------------------------------
+
+getByLabel()
+
+→ Locates a form element using its associated label.
+
+
+Example:
+
+await page.getByLabel('Check me out').click();
+
+
+Here:
+
+'Check me out'
+      ↓
+Label text
+      ↓
+getByLabel()
+      ↓
+Find associated form element
+      ↓
+click()
+
+
+--------------------------------
+2. getByLabel() WITH CHECKBOX
+--------------------------------
+
+await page.getByLabel('Employed').check();
+
+
+`getByLabel('Employed')`
+
+→ Finds the form element associated with the "Employed" label.
+
+
+`.check()`
+
+→ Checks the checkbox.
+
+
+Flow:
+
+getByLabel('Employed')
+          ↓
+    Find checkbox
+          ↓
+        check()
+          ↓
+      ☑ Checked
+
+
+--------------------------------
+3. getByLabel() WITH DROPDOWN
+--------------------------------
+
+await page.getByLabel('Gender').selectOption('Female');
+
+
+`getByLabel('Gender')`
+
+→ Finds the form control associated with the "Gender" label.
+
+
+`.selectOption('Female')`
+
+→ Selects "Female" from the dropdown.
+
+
+Flow:
+
+Gender
+  ↓
+getByLabel()
+  ↓
+Find dropdown
+  ↓
+selectOption('Female')
+  ↓
+Female selected
+
+
+--------------------------------
+4. getByPlaceholder()
+--------------------------------
+
+await page.getByPlaceholder('Password').fill('password123');
+
+
+`getByPlaceholder()`
+
+→ Locates an input field using its placeholder text.
+
+
+For example:
+
+<input placeholder="Password">
+
+
+Then:
+
+getByPlaceholder('Password')
+
+→ Finds that input field.
+
+
+Then:
+
+.fill('password123')
+
+→ Enters `password123` into the input field.
+
+
+Flow:
+
+Placeholder
+     ↓
+"Password"
+     ↓
+getByPlaceholder()
+     ↓
+Find input
+     ↓
+fill()
+
+
+--------------------------------
+5. fill()
+--------------------------------
+
+.fill('password123')
+
+→ Enters the specified value into the input field.
+
+
+Example:
+
+await page.getByPlaceholder('Password').fill('password123');
+
+
+The Password field becomes:
+
+password123
+
+
+--------------------------------
+6. getByRole()
+--------------------------------
+
+await page.getByRole('button', { name: 'Submit' }).click();
+
+
+`getByRole()`
+
+→ Locates an element based on its role.
+
+
+Here:
+
+'button'
+→ Element role.
+
+
+{name: 'Submit'}
+→ Accessible name of the button.
+
+
+So:
+
+getByRole('button', { name: 'Submit' })
+
+
+means:
+
+Find the button whose name is "Submit".
+
+
+Then:
+
+.click()
+
+→ Click the Submit button.
+
+
+--------------------------------
+7. UNDERSTANDING { name: 'Submit' }
+--------------------------------
+
+getByRole('button', { name: 'Submit' })
+
+
+There are two important parts:
+
+
+'button'
+
+→ Defines the role of the element.
+
+
+{name: 'Submit'}
+
+→ Defines the accessible name of the element.
+
+
+So Playwright searches for:
+
+Role
+ ↓
+button
+
+Name
+ ↓
+Submit
+
+
+--------------------------------
+8. CLICK SUBMIT BUTTON
+--------------------------------
+
+await page.getByRole('button', { name: 'Submit' }).click();
+
+
+Flow:
+
+Find button
+     ↓
+Role = button
+     ↓
+Name = Submit
+     ↓
+Click
+     ↓
+Form submitted
+
+
+--------------------------------
+9. getByText()
+--------------------------------
+
+await expect(
+    page.getByText(
+        'Success! The Form has been submitted successfully!.'
+    )
+).toBeVisible();
+
+
+`getByText()`
+
+→ Locates an element based on its text.
+
+
+Here Playwright searches for:
+
+Success! The Form has been submitted successfully!.
+
+
+So:
+
+getByText('Success!...')
+
+→ Finds the element containing that text.
+
+
+--------------------------------
+10. toBeVisible()
+--------------------------------
+
+.toBeVisible()
+
+→ Verifies that the located element is visible on the page.
+
+
+Example:
+
+await expect(page.getByText('Success!')).toBeVisible();
+
+
+This means:
+
+Verify that the "Success!" message is visible.
+
+
+If visible:
+
+→ Assertion passes.
+
+
+If not visible:
+
+→ Assertion fails.
+
+
+--------------------------------
+11. getByRole() WITH LINK
+--------------------------------
+
+await page.getByRole('link', { name: 'Home' }).click();
+
+
+Here:
+
+'link'
+→ Element role.
+
+
+{name: 'Home'}
+→ Link name.
+
+
+So:
+
+getByRole('link', { name: 'Home' })
+
+→ Finds the Home link.
+
+
+Then:
+
+.click()
+
+→ Clicks the Home link.
+
+
+--------------------------------
+12. getByRole() FOR SHOP
+--------------------------------
+
+await page.getByRole('link', { name: 'Shop' }).click();
+
+
+Here:
+
+'link'
+→ Element role.
+
+
+{name: 'Shop'}
+→ Link name.
+
+
+So Playwright:
+
+→ Finds the Shop link.
+→ Clicks the Shop link.
+
+
+Flow:
+
+Find Shop link
+      ↓
+Click
+      ↓
+Shop page opens
+
+
+--------------------------------
+13. page.pause()
+--------------------------------
+
+await page.pause();
+
+
+→ Pauses the test execution.
+
+
+It is mainly useful for debugging and inspecting the current
+state of the application while the test is running.
+
+
+--------------------------------
+14. ACTIONS USED IN THIS CODE
+--------------------------------
+
+click()
+
+→ Clicks an element.
+
+
+check()
+
+→ Checks a checkbox.
+
+
+selectOption()
+
+→ Selects an option from a <select> dropdown.
+
+
+fill()
+
+→ Enters text into an input field.
+
+
+--------------------------------
+15. ASSERTION USED
+--------------------------------
+
+toBeVisible()
+
+→ Verifies that an element is visible.
+
+
+Example:
+
+await expect(page.getByText('Success!')).toBeVisible();
+
+
+--------------------------------
+16. SPECIAL LOCATORS USED
+--------------------------------
+
+getByLabel()
+
+→ Locates form elements using their associated label.
+
+
+getByPlaceholder()
+
+→ Locates an input using its placeholder text.
+
+
+getByRole()
+
+→ Locates an element using its role and accessible name.
+
+
+getByText()
+
+→ Locates an element using its text.
+
+
+--------------------------------
+17. SPECIAL LOCATOR + ACTION
+--------------------------------
+
+LABEL:
+
+getByLabel('Employed')
+        ↓
+      check()
+
+
+LABEL:
+
+getByLabel('Gender')
+        ↓
+selectOption('Female')
+
+
+PLACEHOLDER:
+
+getByPlaceholder('Password')
+        ↓
+fill('password123')
+
+
+ROLE:
+
+getByRole('button', { name: 'Submit' })
+        ↓
+      click()
+
+
+TEXT:
+
+getByText('Success!')
+        ↓
+   toBeVisible()
+
+
+--------------------------------
+18. COMPLETE EXECUTION FLOW
+--------------------------------
+
+Open Angular Practice page
+          ↓
+getByLabel('Check me out')
+          ↓
+Click
+          ↓
+getByLabel('Employed')
+          ↓
+Check checkbox
+          ↓
+getByLabel('Gender')
+          ↓
+Select Female
+          ↓
+getByPlaceholder('Password')
+          ↓
+Enter password
+          ↓
+getByRole('button', { name: 'Submit' })
+          ↓
+Click Submit
+          ↓
+getByText('Success!...')
+          ↓
+Verify message is visible
+          ↓
+getByRole('link', { name: 'Home' })
+          ↓
+Click Home
+          ↓
+getByRole('link', { name: 'Shop' })
+          ↓
+Click Shop
+          ↓
+Pause
+
+
+--------------------------------
+19. EASY WAY TO REMEMBER
+--------------------------------
+
+Label
+  ↓
+getByLabel()
+
+
+Placeholder
+  ↓
+getByPlaceholder()
+
+
+Role
+  ↓
+getByRole()
+
+
+Text
+  ↓
+getByText()
+
+
+Then perform the required action:
+
+click()
+check()
+fill()
+selectOption()
+
+
+For verification:
+
+expect()
+   ↓
+toBeVisible()
+
+
+--------------------------------
+20. QUICK COMPARISON
+--------------------------------
+
+getByLabel()
+→ Locate using Label
+
+getByPlaceholder()
+→ Locate using Placeholder
+
+getByRole()
+→ Locate using Role + Name
+
+getByText()
+→ Locate using Text
+
+
+--------------------------------
+21. KEY TAKEAWAY
+--------------------------------
+
+Special locators make Playwright locators easier to read and
+understand because they use information that is meaningful to users.
+
+In this example:
+
+getByLabel()
+→ Find form elements using labels.
+
+getByPlaceholder()
+→ Find input fields using placeholder.
+
+getByRole()
+→ Find buttons/links using their role and name.
+
+getByText()
+→ Find elements using their text.
+
+
+SHORT FORM:
+
+Label       → getByLabel()
+Placeholder → getByPlaceholder()
+Role        → getByRole()
+Text        → getByText()
+
+--------------------------------
+RUNNING PLAYWRIGHT TESTS USING UI MODE
+--------------------------------
+
+Command:
+
+npx playwright test --ui
+
+
+What is `--ui`?
+
+`--ui` runs Playwright tests in **UI Mode**.
+
+Instead of running the test only through the terminal, Playwright opens
+a graphical interface where we can select, run, and debug tests.
+
+
+--------------------------------
+WHAT HAPPENS WHEN WE RUN IT?
+--------------------------------
+
+npx playwright test --ui
+            ↓
+    Playwright UI opens
+            ↓
+     Tests are displayed
+            ↓
+     Select a test
+            ↓
+       Run the test
+            ↓
+     View test execution
+            ↓
+    Debug if required
+
+
+--------------------------------
+WHY USE UI MODE?
+--------------------------------
+
+UI Mode is mainly useful for:
+
+→ Running tests easily
+→ Seeing available test cases
+→ Debugging tests
+→ Viewing test execution
+→ Inspecting test results
+
+
+--------------------------------
+NORMAL VS UI MODE
+--------------------------------
+
+Normal execution:
+
+npx playwright test
+
+→ Runs the tests from the terminal.
+
+
+UI Mode:
+
+npx playwright test --ui
+
+→ Opens Playwright's graphical UI for running and debugging tests.
+
+
+--------------------------------
+EASY WAY TO REMEMBER
+--------------------------------
+
+npx playwright test
+        ↓
+Run tests normally
+
+
+npx playwright test --ui
+        ↓
+Run tests using Playwright UI
+
+
+--------------------------------
+KEY TAKEAWAY
+--------------------------------
+
+`--ui` = **UI Mode**
+
+It provides a graphical interface to run and debug Playwright tests
+instead of working only from the terminal.
+
+--------------------------------
+PLAYWRIGHT SPECIAL LOCATOR — filter()
+--------------------------------
+
+This is the new concept added to the previous Special Locators topic.
+
+New method:
+
+→ filter({ hasText: 'Blackberry' })
+
+It is used to find a specific element/container based on the text
+inside it.
+
+
+--------------------------------
+NEW CODE
+--------------------------------
+
+await page.locator("app-card")
+    .filter({ hasText: 'Blackberry' })
+    .getByRole('button', { name: 'Add' })
+    .click();
+
+
+--------------------------------
+1. page.locator("app-card")
+--------------------------------
+
+page.locator("app-card")
+
+→ Locates all `app-card` elements on the page.
+
+
+For example, the Shop page may contain:
+
+app-card
+   → iPhone
+   → Samsung
+   → Blackberry
+   → Nokia
+
+
+So:
+
+page.locator("app-card")
+
+→ Finds all product cards.
+
+
+--------------------------------
+2. filter({ hasText: 'Blackberry' })
+--------------------------------
+
+.filter({ hasText: 'Blackberry' })
+
+
+→ Filters the `app-card` elements and selects the card
+that contains the text "Blackberry".
+
+
+Before filtering:
+
+app-card
+   ↓
+iPhone
+
+app-card
+   ↓
+Samsung
+
+app-card
+   ↓
+Blackberry
+
+app-card
+   ↓
+Nokia
+
+
+After:
+
+.filter({ hasText: 'Blackberry' })
+
+
+Only:
+
+app-card
+   ↓
+Blackberry
+
+
+is selected.
+
+
+--------------------------------
+3. getByRole('button', { name: 'Add' })
+--------------------------------
+
+.getByRole('button', { name: 'Add' })
+
+
+After finding the Blackberry product card, Playwright looks
+inside that card for:
+
+Role → button
+Name → Add
+
+
+So it finds the Add button belonging to the Blackberry product.
+
+
+--------------------------------
+4. click()
+--------------------------------
+
+.click()
+
+
+→ Clicks the Add button.
+
+
+Therefore, the Blackberry product is added to the cart.
+
+
+--------------------------------
+5. COMPLETE LINE EXPLANATION
+--------------------------------
+
+await page.locator("app-card")
+    .filter({ hasText: 'Blackberry' })
+    .getByRole('button', { name: 'Add' })
+    .click();
+
+
+Execution happens from left to right:
+
+
+page.locator("app-card")
+        ↓
+Find all product cards
+        ↓
+.filter({ hasText: 'Blackberry' })
+        ↓
+Find the card containing Blackberry
+        ↓
+.getByRole('button', { name: 'Add' })
+        ↓
+Find Add button inside that card
+        ↓
+.click()
+        ↓
+Add Blackberry to cart
+
+
+--------------------------------
+6. WHY DO WE USE filter()?
+--------------------------------
+
+Suppose there are multiple products:
+
+iPhone
+Samsung
+Blackberry
+Nokia
+
+
+And every product has an:
+
+Add
+
+button.
+
+
+If we simply use:
+
+page.getByRole('button', { name: 'Add' })
+
+
+Playwright may find multiple Add buttons.
+
+
+But we want the Add button specifically for:
+
+Blackberry
+
+
+So we first identify the Blackberry card:
+
+.filter({ hasText: 'Blackberry' })
+
+
+Then find the Add button inside that card.
+
+
+--------------------------------
+7. WITHOUT filter()
+--------------------------------
+
+page.getByRole('button', { name: 'Add' }).click();
+
+
+Problem:
+
+There may be multiple "Add" buttons.
+
+
+Playwright cannot know which product's Add button
+we want.
+
+
+--------------------------------
+8. WITH filter()
+--------------------------------
+
+page.locator("app-card")
+    .filter({ hasText: 'Blackberry' })
+    .getByRole('button', { name: 'Add' })
+    .click();
+
+
+Now Playwright knows:
+
+Product
+   ↓
+Blackberry
+   ↓
+Its Add button
+   ↓
+Click
+
+
+--------------------------------
+9. PARENT → FILTER → CHILD
+--------------------------------
+
+This is an important locator concept.
+
+
+Parent:
+
+app-card
+   ↓
+Filter:
+hasText = Blackberry
+   ↓
+Child:
+Add button
+
+
+So:
+
+app-card
+   ↓
+filter({ hasText: 'Blackberry' })
+   ↓
+getByRole('button', { name: 'Add' })
+   ↓
+click()
+
+
+--------------------------------
+10. filter() EASY MEANING
+--------------------------------
+
+filter()
+
+→ Narrows down the matching elements based on a condition.
+
+
+In this example:
+
+.filter({ hasText: 'Blackberry' })
+
+
+means:
+
+"From all the app-card elements, give me the one
+that contains Blackberry."
+
+
+--------------------------------
+11. hasText
+--------------------------------
+
+hasText
+
+→ Checks whether the element contains the specified text.
+
+
+Example:
+
+filter({ hasText: 'Blackberry' })
+
+
+means:
+
+Find the element that contains:
+
+Blackberry
+
+
+--------------------------------
+12. COMPLETE SPECIAL LOCATORS USED SO FAR
+--------------------------------
+
+getByLabel()
+→ Locate using associated label.
+
+
+getByPlaceholder()
+→ Locate using placeholder.
+
+
+getByRole()
+→ Locate using role and accessible name.
+
+
+getByText()
+→ Locate using text.
+
+
+filter({ hasText: 'Blackberry' })
+→ Filter matching elements based on text.
+
+
+--------------------------------
+13. EASY WAY TO REMEMBER
+--------------------------------
+
+Multiple product cards
+        ↓
+filter()
+        ↓
+Find required product
+        ↓
+Find button inside that product
+        ↓
+Click
+
+
+Example:
+
+app-card
+   ↓
+filter({ hasText: 'Blackberry' })
+   ↓
+getByRole('button', { name: 'Add' })
+   ↓
+click()
+
+
+--------------------------------
+14. KEY TAKEAWAY
+--------------------------------
+
+`filter()` is useful when multiple elements match the same locator
+but we want to select a specific element based on something inside it.
+
+In this example:
+
+page.locator("app-card")
+→ Finds product cards.
+
+filter({ hasText: 'Blackberry' })
+→ Selects the Blackberry product card.
+
+getByRole('button', { name: 'Add' })
+→ Finds the Add button inside that card.
+
+click()
+→ Adds Blackberry to the cart.
+
+
+SHORT FORM:
+
+locator()
+   ↓
+Find parent elements
+
+filter()
+   ↓
+Find the required parent based on text
+
+getByRole()
+   ↓
+Find child element
+
+click()
+   ↓
+Perform action
+
+--------------------------------
+DIFFERENCE BETWEEN isVisible() AND toBeVisible()
+--------------------------------
+
+Both `isVisible()` and `toBeVisible()` are used to check whether
+an element is visible.
+
+But they are used differently.
+
+
+--------------------------------
+1. isVisible()
+--------------------------------
+
+await page.getByText(
+    'Success! The Form has been submitted successfully!.'
+).isVisible();
+
+
+`isVisible()`
+
+→ Checks whether the element is visible.
+
+→ Returns a boolean value:
+
+true
+or
+false
+
+
+Example:
+
+const isMessageVisible = await page.getByText(
+    'Success! The Form has been submitted successfully!.'
+).isVisible();
+
+console.log(isMessageVisible);
+
+
+If the message is visible:
+
+true
+
+
+If the message is not visible:
+
+false
+
+
+IMPORTANT:
+
+`isVisible()` only returns the result.
+
+It does NOT automatically fail the test if the result is false.
+
+
+--------------------------------
+2. toBeVisible()
+--------------------------------
+
+await expect(
+    page.getByText(
+        'Success! The Form has been submitted successfully!.'
+    )
+).toBeVisible();
+
+
+`toBeVisible()`
+
+→ Is a Playwright assertion.
+
+→ Verifies that the element is visible.
+
+If the element is visible:
+
+→ Assertion passes.
+
+
+If the element is not visible:
+
+→ Assertion fails.
+
+
+--------------------------------
+3. MAIN DIFFERENCE
+--------------------------------
+
+isVisible()
+
+→ Checks visibility
+→ Returns `true` or `false`
+→ Does not automatically fail the test
+
+
+toBeVisible()
+
+→ Verifies visibility
+→ Used with `expect()`
+→ Fails the test if the condition is not satisfied
+
+
+--------------------------------
+4. EASY COMPARISON
+--------------------------------
+
+isVisible()
+
+        ↓
+   Check the element
+        ↓
+   true / false
+
+
+toBeVisible()
+
+        ↓
+     Assertion
+        ↓
+Pass / Fail
+
+
+--------------------------------
+5. EXAMPLE
+--------------------------------
+
+Using isVisible():
+
+const result = await page.getByText('Success!').isVisible();
+
+console.log(result);
+
+
+Output:
+
+true
+
+
+The test can continue even if the result is false,
+unless we explicitly use the result in a condition/assertion.
+
+
+--------------------------------
+Using toBeVisible():
+
+await expect(
+    page.getByText('Success!')
+).toBeVisible();
+
+
+If visible:
+
+✅ Test passes
+
+
+If not visible:
+
+❌ Test fails
+
+
+--------------------------------
+6. WHEN TO USE
+--------------------------------
+
+Use `isVisible()` when:
+
+→ You want to get the visibility status as `true` or `false`.
+→ You want to use that result in your own logic.
+
+
+Use `toBeVisible()` when:
+
+→ You want to verify/assert that the element must be visible.
+→ You are writing a test validation.
+
+
+--------------------------------
+7. EASY WAY TO REMEMBER
+--------------------------------
+
+isVisible()
+    ↓
+"Tell me if it is visible."
+    ↓
+true / false
+
+
+toBeVisible()
+    ↓
+"Verify that it is visible."
+    ↓
+Pass / Fail
+
+
+--------------------------------
+8. KEY TAKEAWAY
+--------------------------------
+
+`isVisible()` → **Check and return boolean**
+
+`toBeVisible()` → **Assert and pass/fail the test**
+
+--------------------------------
+PLAYWRIGHT TIMEOUTS
+--------------------------------
+
+Timeout means:
+
+→ The maximum amount of time Playwright waits for an operation
+   to complete.
+
+Playwright provides different types of timeouts for different purposes.
+
+In this topic, we will cover:
+
+1. Test Timeout
+2. Action Timeout
+3. Navigation Timeout
+4. Expect Timeout
+5. Locator/Action-specific Timeout
+6. expect.configure() Timeout
+
+
+--------------------------------
+1. TEST TIMEOUT
+--------------------------------
+
+Syntax:
+
+test.setTimeout(60000);
+
+
+60000 milliseconds
+       ↓
+   60 seconds
+
+
+Test timeout defines the maximum time allowed for the
+entire test to complete.
+
+
+Example:
+
+test('Test', async ({ page }) => {
+
+    test.setTimeout(60000);
+
+    // Complete test execution
+});
+
+
+If the entire test takes more than 60 seconds:
+
+❌ Test fails due to timeout.
+
+
+IMPORTANT:
+
+Test Timeout
+→ Applies to the complete test.
+
+
+--------------------------------
+2. ACTION TIMEOUT
+--------------------------------
+
+Syntax in Playwright config:
+
+use: {
+    actionTimeout: 10 * 1000,
+}
+
+
+10 * 1000
+    ↓
+10000 milliseconds
+    ↓
+10 seconds
+
+
+Action timeout defines how long Playwright waits for actions such as:
+
+→ click()
+→ fill()
+→ check()
+→ selectOption()
+
+
+Example:
+
+await page.getByRole('button', { name: 'Submit' }).click();
+
+
+Playwright can wait up to the configured action timeout
+for the action to complete.
+
+
+IMPORTANT:
+
+Action Timeout
+→ Applies to Playwright actions.
+
+
+--------------------------------
+3. PAGE SETDEFAULTTIMEOUT()
+--------------------------------
+
+Syntax:
+
+page.setDefaultTimeout(9000);
+
+
+9000 milliseconds
+       ↓
+    9 seconds
+
+
+This sets the default timeout for actions and locator operations
+performed through the page.
+
+
+Example:
+
+page.setDefaultTimeout(9000);
+
+
+Now actions such as:
+
+click()
+fill()
+check()
+
+can wait up to 9 seconds by default.
+
+
+IMPORTANT:
+
+page.setDefaultTimeout()
+→ Sets the default timeout at the Page level.
+
+
+--------------------------------
+4. NAVIGATION TIMEOUT
+--------------------------------
+
+Syntax in Playwright config:
+
+use: {
+    navigationTimeout: 30 * 1000,
+}
+
+
+30 * 1000
+    ↓
+30000 milliseconds
+    ↓
+30 seconds
+
+
+Navigation timeout defines how long Playwright waits for
+navigation-related operations.
+
+
+Examples:
+
+page.goto()
+page.reload()
+page.goBack()
+page.goForward()
+
+
+Example:
+
+await page.goto('https://example.com');
+
+
+Playwright can wait up to 30 seconds for the navigation.
+
+
+IMPORTANT:
+
+Navigation Timeout
+→ Applies to navigation operations.
+
+
+--------------------------------
+5. EXPECT TIMEOUT
+--------------------------------
+
+Syntax in Playwright config:
+
+expect: {
+    timeout: 5 * 1000,
+},
+
+
+5 * 1000
+    ↓
+5000 milliseconds
+    ↓
+5 seconds
+
+
+Expect timeout defines how long Playwright waits for
+assertions to pass.
+
+
+Example:
+
+await expect(locator).toBeVisible();
+
+
+Playwright waits up to the configured expect timeout
+for the assertion to pass.
+
+
+IMPORTANT:
+
+Expect Timeout
+→ Applies to Playwright assertions.
+
+
+--------------------------------
+6. ASSERTION-SPECIFIC TIMEOUT
+--------------------------------
+
+We can also specify a timeout directly on an assertion.
+
+
+Example:
+
+await expect(locator).toBeVisible({
+    timeout: 10000
+});
+
+
+10000 milliseconds
+       ↓
+    10 seconds
+
+
+This means:
+
+"Wait up to 10 seconds for this particular assertion."
+
+
+The timeout applies only to this assertion.
+
+
+--------------------------------
+7. expect.configure()
+--------------------------------
+
+Syntax:
+
+const slowExpect = expect.configure({
+    timeout: 10000
+});
+
+
+This creates a customized version of `expect`.
+
+
+Now:
+
+await slowExpect(locator).toBeVisible();
+
+
+uses the configured 10-second timeout.
+
+
+This is useful when we want to reuse the same custom
+assertion timeout multiple times.
+
+
+Example:
+
+const slowExpect = expect.configure({
+    timeout: 10000
+});
+
+await slowExpect(locator1).toBeVisible();
+await slowExpect(locator2).toHaveText('Success');
+
+
+Both assertions use the configured timeout.
+
+
+--------------------------------
+8. ACTION-SPECIFIC TIMEOUT
+--------------------------------
+
+We can also provide a timeout directly to an action.
+
+
+Example:
+
+await page.getByRole('link', { name: 'Shop' })
+    .click({ timeout: 10000 });
+
+
+Here:
+
+timeout: 10000
+
+→ Wait up to 10 seconds for this particular click action.
+
+
+This overrides the default action timeout for this action.
+
+
+IMPORTANT:
+
+Action-specific timeout
+→ Applies only to that particular action.
+
+
+--------------------------------
+9. COMPLETE TIMEOUT CONFIGURATION
+--------------------------------
+
+A Playwright configuration can contain:
+
+use: {
+
+    actionTimeout: 10 * 1000,
+
+    navigationTimeout: 30 * 1000,
+
+},
+
+expect: {
+
+    timeout: 5 * 1000,
+
+},
+
+timeout: 15 * 1000,
+
+
+Meaning:
+
+
+actionTimeout: 10 seconds
+→ Timeout for actions.
+
+
+navigationTimeout: 30 seconds
+→ Timeout for navigation.
+
+
+expect.timeout: 5 seconds
+→ Timeout for assertions.
+
+
+timeout: 15 seconds
+→ Maximum timeout for the complete test.
+
+
+--------------------------------
+10. TIMEOUT HIERARCHY — EASY UNDERSTANDING
+--------------------------------
+
+TEST
+ ↓
+test.setTimeout()
+ ↓
+Maximum time for entire test
+
+
+ACTION
+ ↓
+actionTimeout
+ ↓
+Maximum time for actions
+
+
+NAVIGATION
+ ↓
+navigationTimeout
+ ↓
+Maximum time for navigation
+
+
+ASSERTION
+ ↓
+expect timeout
+ ↓
+Maximum time for assertions
+
+
+--------------------------------
+11. QUICK COMPARISON
+--------------------------------
+
+Test Timeout
+→ Entire test
+
+
+Action Timeout
+→ Actions such as click(), fill(), check()
+
+
+Navigation Timeout
+→ goto(), reload(), goBack(), etc.
+
+
+Expect Timeout
+→ expect() assertions
+
+
+Action-specific timeout
+→ One particular action
+
+
+Assertion-specific timeout
+→ One particular assertion
+
+
+expect.configure()
+→ Create reusable customized expect timeout
+
+
+--------------------------------
+12. EASY WAY TO REMEMBER
+--------------------------------
+
+test.setTimeout(60000)
+        ↓
+Entire Test
+        ↓
+60 seconds
+
+
+actionTimeout: 10000
+        ↓
+Actions
+        ↓
+10 seconds
+
+
+navigationTimeout: 30000
+        ↓
+Navigation
+        ↓
+30 seconds
+
+
+expect: { timeout: 5000 }
+        ↓
+Assertions
+        ↓
+5 seconds
+
+
+.click({ timeout: 10000 })
+        ↓
+One specific action
+        ↓
+10 seconds
+
+
+.toBeVisible({ timeout: 10000 })
+        ↓
+One specific assertion
+        ↓
+10 seconds
+
+
+expect.configure({ timeout: 10000 })
+        ↓
+Reusable custom expect
+        ↓
+10 seconds
+
+
+--------------------------------
+13. IMPORTANT DIFFERENCE
+--------------------------------
+
+Timeout does NOT mean:
+
+"Wait exactly this amount of time."
+
+
+It means:
+
+"Wait UP TO this amount of time if required."
+
+
+For example:
+
+timeout: 10000
+
+
+does NOT mean Playwright always waits 10 seconds.
+
+If the element becomes available after 2 seconds:
+
+→ Playwright continues after 2 seconds.
+
+
+If it never becomes available:
+
+→ Playwright waits up to 10 seconds and then fails.
+
+
+--------------------------------
+14. KEY TAKEAWAY
+--------------------------------
+
+Timeouts control how long Playwright waits for different
+types of operations.
+
+Test
+→ test.setTimeout()
+
+
+Actions
+→ actionTimeout
+
+
+Navigation
+→ navigationTimeout
+
+
+Assertions
+→ expect timeout
+
+
+One action
+→ { timeout: 10000 }
+
+
+One assertion
+→ { timeout: 10000 }
+
+
+Reusable assertion timeout
+→ expect.configure()
+
+
+SHORT FORM:
+
+TEST       → test timeout
+ACTION     → action timeout
+NAVIGATION → navigation timeout
+ASSERTION  → expect timeout
