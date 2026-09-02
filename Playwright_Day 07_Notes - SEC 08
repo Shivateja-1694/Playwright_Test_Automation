@@ -1,0 +1,290 @@
+--------------------------------
+DAY 07 — 09/02 — WEDNESDAY
+--------------------------------
+
+--------------
+SECTION 08
+--------------
+
+--------------------------------
+PLAYWRIGHT INSPECTOR
+--------------------------------
+
+Playwright Inspector is a debugging tool that helps us:
+
+→ Debug Playwright tests step-by-step
+→ Inspect locators
+→ Pause test execution
+→ See which action is being performed
+→ Generate locators using Codegen
+
+
+--------------------------------
+1. RUN TEST IN DEBUG MODE
+--------------------------------
+
+Command:
+
+npx playwright test tests/playwrightSpecialLocators.spec.ts --debug
+
+
+`--debug`
+
+→ Runs the test in Playwright's debug mode.
+
+It opens the Playwright Inspector and pauses the test so that
+we can execute the test step-by-step.
+
+
+Flow:
+
+Test
+ ↓
+--debug
+ ↓
+Playwright Inspector
+ ↓
+Execute step-by-step
+ ↓
+Debug the test
+
+
+--------------------------------
+2. WHAT CAN WE DO IN DEBUG MODE?
+--------------------------------
+
+Using Playwright Inspector, we can:
+
+→ Run the next step
+→ Pause execution
+→ Inspect the current page
+→ Check locators
+→ Debug failing steps
+→ Understand the test execution
+
+
+--------------------------------
+3. PLAYWRIGHT CODEGEN
+--------------------------------
+
+Command:
+
+npx playwright codegen https://rahulshettyacademy.com/angularpractice/
+
+
+`codegen`
+
+→ Opens the specified website and automatically generates
+Playwright code based on our actions.
+
+
+For example:
+
+Open website
+     ↓
+Click an element
+     ↓
+Codegen generates locator/code
+     ↓
+We can use the generated code in our test
+
+
+--------------------------------
+4. WHY USE CODEGEN?
+--------------------------------
+
+Codegen is useful for:
+
+→ Quickly creating Playwright locators
+→ Learning Playwright syntax
+→ Identifying elements
+→ Creating basic test code quickly
+
+
+Example:
+
+npx playwright codegen https://example.com
+
+
+Playwright opens the website and starts recording our actions.
+
+
+--------------------------------
+5. SCREENSHOT
+--------------------------------
+
+Configuration:
+
+screenshot: 'on'
+
+
+`screenshot: 'on'`
+
+→ Takes screenshots during test execution based on the
+configured Playwright screenshot behavior.
+
+
+It can be useful when debugging test failures because we can
+see the state of the page.
+
+
+A common configuration example:
+
+use: {
+    screenshot: 'on'
+}
+
+
+--------------------------------
+6. TRACE
+--------------------------------
+
+Configuration:
+
+trace: 'on'
+
+
+`trace: 'on'`
+
+→ Enables Playwright tracing.
+
+
+Tracing helps us investigate what happened during test execution.
+
+
+It can provide information such as:
+
+→ Actions performed
+→ Screenshots
+→ Page activity
+→ Test execution details
+
+
+It is useful when debugging failed tests.
+
+
+A common configuration example:
+
+use: {
+    trace: 'on'
+}
+
+
+--------------------------------
+7. INSPECTOR vs CODEGEN
+--------------------------------
+
+Playwright Inspector:
+
+→ Mainly used for debugging and stepping through tests.
+
+
+Codegen:
+
+→ Mainly used for generating Playwright code and locators.
+
+
+Easy way to remember:
+
+Inspector
+    ↓
+Debug the test
+
+
+Codegen
+    ↓
+Generate the code
+
+
+--------------------------------
+8. SCREENSHOT vs TRACE
+--------------------------------
+
+Screenshot:
+
+→ Gives us a picture of the page.
+
+
+Trace:
+
+→ Gives us detailed information about test execution.
+
+
+Easy way to remember:
+
+Screenshot
+    ↓
+What did the page look like?
+
+
+Trace
+    ↓
+What happened during the test?
+
+
+--------------------------------
+9. COMPLETE COMMANDS
+--------------------------------
+
+Debug a test:
+
+npx playwright test tests/playwrightSpecialLocators.spec.ts --debug
+
+
+Generate Playwright code:
+
+npx playwright codegen https://rahulshettyacademy.com/angularpractice/
+
+
+--------------------------------
+10. QUICK NOTES
+--------------------------------
+
+`--debug`
+
+→ Runs the test in debug mode using Playwright Inspector.
+
+
+`codegen`
+
+→ Generates Playwright code based on user actions.
+
+
+`screenshot: 'on'`
+
+→ Enables screenshots during test execution.
+
+
+`trace: 'on'`
+
+→ Enables Playwright tracing for debugging.
+
+
+--------------------------------
+11. KEY TAKEAWAY
+--------------------------------
+
+Playwright Inspector
+→ Debug and execute tests step-by-step.
+
+
+Codegen
+→ Generate locators and Playwright code.
+
+
+Screenshot
+→ Capture the page state.
+
+
+Trace
+→ Analyze what happened during test execution.
+
+
+SHORT FORM:
+
+Inspector → Debug
+Codegen    → Generate code
+Screenshot → Capture page
+Trace      → Analyze execution
+		  
+		  
