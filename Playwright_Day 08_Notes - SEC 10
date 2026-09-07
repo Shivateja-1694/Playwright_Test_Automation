@@ -1,0 +1,1208 @@
+--------------------------------
+DAY 08 — 09/06 — SUNDAY
+--------------------------------
+
+--------------
+SECTION 10
+--------------
+
+--------------------------------
+PLAYWRIGHT POPUP / ELEMENT VISIBILITY VALIDATION
+--------------------------------
+
+This code demonstrates how to validate whether an element is:
+
+→ Visible
+→ Hidden
+
+It uses Playwright assertions:
+
+→ toBeVisible()
+→ toBeHidden()
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { expect, test } from '@playwright/test';
+
+test("popup validation", async ({ page }) => {
+
+    await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
+
+    await expect(page.locator("#displayed-text")).toBeVisible();
+
+    await page.locator("#hide-textbox").click();
+
+    await expect(page.locator("#displayed-text")).toBeHidden();
+
+});
+
+
+--------------------------------
+1. OPEN THE WEBSITE
+--------------------------------
+
+await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
+
+
+→ Opens the Automation Practice website.
+
+
+--------------------------------
+2. VERIFY ELEMENT IS VISIBLE
+--------------------------------
+
+await expect(page.locator("#displayed-text")).toBeVisible();
+
+
+`#displayed-text`
+
+→ Locates the textbox/element using its ID.
+
+
+`toBeVisible()`
+
+→ Verifies that the element is currently visible.
+
+
+So this line means:
+
+"Verify that the displayed-text element is visible."
+
+
+If visible:
+
+✅ Assertion passes.
+
+
+If not visible:
+
+❌ Assertion fails.
+
+
+--------------------------------
+3. CLICK HIDE TEXTBOX
+--------------------------------
+
+await page.locator("#hide-textbox").click();
+
+
+`#hide-textbox`
+
+→ Locates the "Hide" button using its ID.
+
+
+`.click()`
+
+→ Clicks the button.
+
+
+After clicking the button, the textbox becomes hidden.
+
+
+Flow:
+
+Hide button
+    ↓
+Click
+    ↓
+Textbox becomes hidden
+
+
+--------------------------------
+4. VERIFY ELEMENT IS HIDDEN
+--------------------------------
+
+await expect(page.locator("#displayed-text")).toBeHidden();
+
+
+`toBeHidden()`
+
+→ Verifies that the element is hidden.
+
+
+So this line means:
+
+"Verify that the displayed-text element is hidden."
+
+
+If hidden:
+
+✅ Assertion passes.
+
+
+If still visible:
+
+❌ Assertion fails.
+
+
+--------------------------------
+5. COMPLETE EXECUTION FLOW
+--------------------------------
+
+Open Automation Practice page
+          ↓
+Find #displayed-text
+          ↓
+Verify it is visible
+          ↓
+Find #hide-textbox
+          ↓
+Click Hide button
+          ↓
+Textbox becomes hidden
+          ↓
+Find #displayed-text
+          ↓
+Verify it is hidden
+
+
+--------------------------------
+6. toBeVisible() vs toBeHidden()
+--------------------------------
+
+toBeVisible()
+
+→ Verifies that an element is visible.
+
+
+toBeHidden()
+
+→ Verifies that an element is hidden.
+
+
+Easy way to remember:
+
+Visible
+   ↓
+toBeVisible()
+
+
+Hidden
+   ↓
+toBeHidden()
+
+
+--------------------------------
+7. COMMENTED NAVIGATION COMMANDS
+--------------------------------
+
+The code also contains these commented commands:
+
+// await page.goto("https://google.com");
+// await page.goBack();
+// await page.goForward();
+// await page.reload();
+
+
+These are navigation-related methods.
+
+
+page.goto()
+
+→ Navigates to a URL.
+
+
+page.goBack()
+
+→ Goes back to the previous page.
+
+
+page.goForward()
+
+→ Goes forward to the next page.
+
+
+page.reload()
+
+→ Reloads the current page.
+
+
+Since they are commented using `//`, they are NOT executed.
+
+
+--------------------------------
+8. WHY THIS IS CALLED VALIDATION
+--------------------------------
+
+The test is validating the behavior of the Hide button.
+
+Before clicking:
+
+Textbox
+   ↓
+Visible
+
+
+After clicking Hide:
+
+Textbox
+   ↓
+Hidden
+
+
+So we are verifying that the UI behaves as expected.
+
+
+--------------------------------
+9. EASY WAY TO REMEMBER
+--------------------------------
+
+Before action:
+
+expect(locator).toBeVisible();
+
+
+Perform action:
+
+locator.click();
+
+
+After action:
+
+expect(locator).toBeHidden();
+
+
+Pattern:
+
+Verify initial state
+       ↓
+Perform action
+       ↓
+Verify changed state
+
+
+--------------------------------
+10. KEY TAKEAWAY
+--------------------------------
+
+`toBeVisible()`
+
+→ Verifies that an element is visible.
+
+
+`toBeHidden()`
+
+→ Verifies that an element is hidden.
+
+
+In this example:
+
+#displayed-text
+→ Textbox being validated.
+
+
+#hide-textbox
+→ Button used to hide the textbox.
+
+
+Overall:
+
+Visible
+   ↓
+Click Hide
+   ↓
+Hidden
+
+
+import {expect, test} from '@playwright/test';
+
+test("popup validation", async ({page}) => {
+  await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
+//   await page.goto("https://google.com");
+//   await page.goBack();
+//   await page.goForward();
+//   await page.reload();
+await expect(page.locator("#displayed-text")).toBeVisible();
+await page.locator("#hide-textbox").click();
+await expect(page.locator("#displayed-text")).toBeHidden();
+
+await page.pause();
+
+page.on("dialog", async (dialog) => {
+  console.log(dialog.message());
+  await dialog.accept();
+
+});
+await page.locator("#confirmbtn").click();
+await page.locator("#mousehover").hover();
+
+});
+
+--------------------------------
+PLAYWRIGHT DIALOG / POPUP HANDLING
+--------------------------------
+
+The new lines demonstrate how to handle JavaScript browser dialogs
+such as:
+
+→ Alert
+→ Confirm
+→ Prompt
+
+The main new concepts are:
+
+→ page.on("dialog")
+→ dialog.message()
+→ dialog.accept()
+
+
+--------------------------------
+1. page.on("dialog")
+--------------------------------
+
+page.on("dialog", async (dialog) => {
+
+});
+
+
+`page.on("dialog")`
+
+→ Listens for a dialog that appears on the page.
+
+When a JavaScript dialog appears, Playwright captures it through
+the `dialog` event.
+
+
+Flow:
+
+Dialog appears
+      ↓
+page.on("dialog")
+      ↓
+Dialog object received
+      ↓
+Handle the dialog
+
+
+--------------------------------
+2. dialog
+--------------------------------
+
+async (dialog) => {
+
+});
+
+
+`dialog`
+
+→ Represents the browser dialog that appeared.
+
+Using this `dialog` object, we can get information about the dialog
+and perform actions on it.
+
+
+--------------------------------
+3. dialog.message()
+--------------------------------
+
+console.log(dialog.message());
+
+
+`dialog.message()`
+
+→ Gets the message/text displayed inside the dialog.
+
+
+For example, if the popup displays:
+
+Hello Shiva
+
+
+Then:
+
+dialog.message()
+
+returns:
+
+Hello Shiva
+
+
+And:
+
+console.log(dialog.message());
+
+prints:
+
+Hello Shiva
+
+
+Flow:
+
+Dialog
+  ↓
+message()
+  ↓
+Get popup text
+  ↓
+console.log()
+
+
+--------------------------------
+4. dialog.accept()
+--------------------------------
+
+await dialog.accept();
+
+
+`dialog.accept()`
+
+→ Accepts the dialog.
+
+
+For an Alert:
+
+OK
+ ↓
+accept()
+
+
+For a Confirm dialog:
+
+OK
+ ↓
+accept()
+
+
+So:
+
+await dialog.accept();
+
+→ Clicks the OK/Accept button of the dialog.
+
+
+--------------------------------
+5. COMPLETE DIALOG HANDLING
+--------------------------------
+
+page.on("dialog", async (dialog) => {
+
+    console.log(dialog.message());
+
+    await dialog.accept();
+
+});
+
+
+Execution:
+
+Dialog appears
+      ↓
+Dialog event is triggered
+      ↓
+dialog object is received
+      ↓
+Get dialog message
+      ↓
+Print message
+      ↓
+Accept dialog
+
+
+--------------------------------
+6. CLICK THE CONFIRM BUTTON
+--------------------------------
+
+await page.locator("#confirmbtn").click();
+
+
+`#confirmbtn`
+
+→ Locates the Confirm button.
+
+
+`.click()`
+
+→ Clicks the button.
+
+
+When the button is clicked, the browser dialog appears.
+
+
+Because we already registered:
+
+page.on("dialog", ...)
+
+
+Playwright handles the dialog automatically.
+
+
+Flow:
+
+#confirmbtn
+    ↓
+Click
+    ↓
+Confirm dialog appears
+    ↓
+page.on("dialog")
+    ↓
+dialog.message()
+    ↓
+dialog.accept()
+    ↓
+Dialog accepted
+
+
+--------------------------------
+7. IMPORTANT ORDER
+--------------------------------
+
+The dialog handler should be registered BEFORE clicking the
+button that opens the dialog.
+
+
+Correct:
+
+page.on("dialog", async (dialog) => {
+    console.log(dialog.message());
+    await dialog.accept();
+});
+
+await page.locator("#confirmbtn").click();
+
+
+Why?
+
+Because Playwright needs to be ready to handle the dialog
+when it appears.
+
+
+--------------------------------
+8. page.pause()
+--------------------------------
+
+await page.pause();
+
+
+→ Pauses test execution.
+
+It can be used for debugging and inspecting the current state
+of the application.
+
+
+In this code, it appears before the dialog handler.
+
+
+--------------------------------
+9. page.locator("#mousehover").hover()
+--------------------------------
+
+await page.locator("#mousehover").hover();
+
+
+`.hover()`
+
+→ Moves the mouse pointer over the specified element.
+
+
+Here:
+
+#mousehover
+    ↓
+Locate element
+    ↓
+hover()
+    ↓
+Mouse moves over the element
+
+
+This is useful when hovering displays a menu or additional options.
+
+
+--------------------------------
+10. NEW METHODS IN THIS CODE
+--------------------------------
+
+page.on("dialog", ...)
+→ Listen for a browser dialog.
+
+
+dialog.message()
+→ Get the message from the dialog.
+
+
+dialog.accept()
+→ Accept the dialog.
+
+
+hover()
+→ Move the mouse over an element.
+
+
+--------------------------------
+11. EASY WAY TO REMEMBER
+--------------------------------
+
+Dialog Handling:
+
+page.on("dialog")
+        ↓
+Listen for dialog
+        ↓
+dialog.message()
+        ↓
+Read message
+        ↓
+dialog.accept()
+        ↓
+Accept dialog
+
+
+Mouse Hover:
+
+locator.hover()
+      ↓
+Move mouse over element
+
+
+--------------------------------
+12. KEY TAKEAWAY
+--------------------------------
+
+`page.on("dialog")`
+
+→ Handles browser dialogs.
+
+
+`dialog.message()`
+
+→ Gets the dialog message.
+
+
+`dialog.accept()`
+
+→ Accepts the dialog.
+
+
+`hover()`
+
+→ Moves the mouse over an element.
+
+
+SHORT FORM:
+
+Dialog appears
+     ↓
+page.on("dialog")
+     ↓
+dialog.message() → Read message
+     ↓
+dialog.accept()  → Accept popup
+
+--------------------------------
+PLAYWRIGHT IFRAME HANDLING
+--------------------------------
+
+The new part of this code demonstrates how to interact with
+elements inside an iframe.
+
+The main new concepts are:
+
+→ frameLocator()
+→ Locating elements inside an iframe
+→ Using Playwright locators within an iframe
+→ Extracting text from an iframe
+
+
+--------------------------------
+1. WHAT IS AN IFRAME?
+--------------------------------
+
+An iframe (Inline Frame) is a webpage embedded inside another webpage.
+
+Think of it as:
+
+Main Page
+   ↓
+Iframe
+   ↓
+Another webpage/content
+
+
+Elements inside the iframe belong to the iframe's page content.
+
+Therefore, we need to first access the iframe before locating
+elements inside it.
+
+
+--------------------------------
+2. frameLocator()
+--------------------------------
+
+const coursesFrame = page.frameLocator("#courses-iframe");
+
+
+`frameLocator()`
+
+→ Creates a locator for an iframe.
+
+Here:
+
+#courses-iframe
+
+→ Identifies the iframe using its ID.
+
+
+So:
+
+page.frameLocator("#courses-iframe")
+
+means:
+
+"Find the iframe with ID `courses-iframe` and allow me to
+interact with elements inside it."
+
+
+The result is stored in:
+
+coursesFrame
+
+
+--------------------------------
+3. WHY DO WE USE frameLocator()?
+--------------------------------
+
+Suppose the main page contains:
+
+Main Page
+   ↓
+#courses-iframe
+   ↓
+Courses webpage
+   ↓
+Course links
+
+
+If we try to directly locate the course link from the main page,
+Playwright may not find it because the link belongs to the iframe.
+
+
+So we use:
+
+page.frameLocator("#courses-iframe")
+
+
+Then we can locate elements inside it.
+
+
+--------------------------------
+4. LOCATING ELEMENT INSIDE IFRAME
+--------------------------------
+
+await coursesFrame
+    .locator("li a[href*='lifetime-access']:visible")
+    .click();
+
+
+Here:
+
+coursesFrame
+
+→ Represents the iframe.
+
+
+`.locator(...)`
+
+→ Finds an element inside that iframe.
+
+
+The locator:
+
+li a[href*='lifetime-access']:visible
+
+
+means:
+
+Find an `<a>` element:
+
+→ Inside an `li`
+→ Whose href contains `lifetime-access`
+→ Which is currently visible
+
+
+Then:
+
+.click()
+
+→ Clicks that link.
+
+
+--------------------------------
+5. UNDERSTANDING THE LOCATOR
+--------------------------------
+
+li a[href*='lifetime-access']:visible
+
+
+`li`
+
+→ List item.
+
+
+`a`
+
+→ Anchor/link.
+
+
+`[href*='lifetime-access']`
+
+→ Finds an element whose `href` attribute contains:
+
+lifetime-access
+
+
+The `*=` means:
+
+"contains"
+
+
+`:visible`
+
+→ Selects the element that is visible.
+
+
+So the complete locator means:
+
+"Find the visible link inside an `li` whose href contains
+'lifetime-access'."
+
+
+--------------------------------
+6. GET TEXT FROM IFRAME
+--------------------------------
+
+const text = await coursesFrame
+    .locator(".text h2")
+    .textContent();
+
+
+Here:
+
+coursesFrame
+
+→ Access the iframe.
+
+
+`.locator(".text h2")`
+
+→ Find the `<h2>` element inside the iframe.
+
+
+`.textContent()`
+
+→ Gets the text from that element.
+
+
+The result is stored in:
+
+text
+
+
+For example, if the iframe contains:
+
+<h2>Access 365</h2>
+
+
+Then:
+
+text
+
+contains:
+
+Access 365
+
+
+--------------------------------
+7. OPTIONAL CHAINING (?) 
+--------------------------------
+
+console.log(text?.split(" ")[1].trim());
+
+
+The `?` in:
+
+text?.split()
+
+
+is called optional chaining.
+
+
+It means:
+
+"If `text` has a value, perform the operation.
+If `text` is null or undefined, don't throw an error."
+
+
+So:
+
+text?.split(" ")
+
+
+safely performs `split()` if text exists.
+
+
+--------------------------------
+8. split(" ")
+--------------------------------
+
+text?.split(" ")
+
+
+Suppose:
+
+text = "Access 365"
+
+
+After:
+
+split(" ")
+
+
+we get:
+
+[0] → Access
+[1] → 365
+
+
+Then:
+
+[1]
+
+
+selects:
+
+365
+
+
+--------------------------------
+9. trim()
+--------------------------------
+
+.trim()
+
+
+→ Removes unnecessary spaces from the beginning and end
+of the string.
+
+
+Example:
+
+" 365 ".trim()
+
+
+becomes:
+
+"365"
+
+
+So:
+
+text?.split(" ")[1].trim()
+
+
+means:
+
+Get the text
+    ↓
+Split using space
+    ↓
+Take the second value
+    ↓
+Remove extra spaces
+
+
+--------------------------------
+10. COMPLETE TEXT EXTRACTION FLOW
+--------------------------------
+
+const text = await coursesFrame
+    .locator(".text h2")
+    .textContent();
+
+
+        ↓
+
+Find h2 inside iframe
+
+
+        ↓
+
+Get its text
+
+
+        ↓
+
+text
+
+
+Then:
+
+text?.split(" ")[1].trim()
+
+
+        ↓
+
+Split text by space
+
+
+        ↓
+
+Take index 1
+
+
+        ↓
+
+Remove extra spaces
+
+
+        ↓
+
+Print result
+
+
+--------------------------------
+11. COMPLETE IFRAME FLOW
+--------------------------------
+
+Main Page
+    ↓
+Find iframe
+    ↓
+frameLocator("#courses-iframe")
+    ↓
+Access iframe
+    ↓
+Locate element inside iframe
+    ↓
+Click course link
+    ↓
+Locate h2 inside iframe
+    ↓
+Get text
+    ↓
+Process text
+    ↓
+Print result
+
+
+--------------------------------
+12. NEW CONCEPTS IN THIS CODE
+--------------------------------
+
+frameLocator()
+
+→ Access an iframe and locate elements inside it.
+
+
+locator() with frameLocator
+
+→ Locate an element inside the iframe.
+
+
+textContent()
+
+→ Get text from an element.
+
+
+[href*='value']
+
+→ Locate an element whose attribute contains the specified value.
+
+
+:visible
+
+→ Select a visible element.
+
+
+optional chaining `?.`
+
+→ Safely perform an operation when the value may be null/undefined.
+
+
+split(" ")
+
+→ Split a string based on spaces.
+
+
+[1]
+
+→ Select the second item because Playwright/JavaScript uses
+zero-based indexing.
+
+
+trim()
+
+→ Remove extra spaces.
+
+
+--------------------------------
+13. EASY WAY TO REMEMBER
+--------------------------------
+
+For normal page:
+
+page.locator()
+      ↓
+Find element
+
+
+For iframe:
+
+page.frameLocator()
+      ↓
+Access iframe
+      ↓
+locator()
+      ↓
+Find element inside iframe
+
+
+SHORT FORM:
+
+Main Page
+    ↓
+frameLocator()
+    ↓
+Iframe
+    ↓
+locator()
+    ↓
+Element
+    ↓
+Action / Assertion
+
+
+--------------------------------
+14. KEY TAKEAWAY
+--------------------------------
+
+`frameLocator()` is used when we need to interact with elements
+inside an iframe.
+
+In this code:
+
+const coursesFrame = page.frameLocator("#courses-iframe");
+
+
+→ Accesses the iframe.
+
+
+coursesFrame.locator(...)
+
+
+→ Locates elements inside the iframe.
+
+
+coursesFrame.locator(...).click()
+
+
+→ Clicks an element inside the iframe.
+
+
+coursesFrame.locator(...).textContent()
+
+
+→ Gets text from an element inside the iframe.
