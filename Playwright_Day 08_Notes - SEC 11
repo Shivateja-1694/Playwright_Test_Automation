@@ -1,0 +1,1940 @@
+--------------------------------
+DAY 08 — 09/06 — SUNDAY
+--------------------------------
+
+--------------
+SECTION 11
+--------------
+
+--------------------------------
+API LOGIN + TOKEN-BASED AUTHENTICATION IN PLAYWRIGHT
+--------------------------------
+
+This code demonstrates how to:
+
+→ Perform login through an API instead of the UI
+→ Extract the authentication token from the API response
+→ Store the token in a variable
+→ Inject the token into browser localStorage
+→ Open the application already authenticated
+→ Continue UI automation without entering username/password
+
+
+--------------------------------
+1. IMPORT request
+--------------------------------
+
+import { expect, test, request } from "@playwright/test";
+
+
+The new part is:
+
+request
+
+
+`request`
+
+→ Used to create an API request context.
+
+It allows us to send API requests such as:
+
+→ GET
+→ POST
+→ PUT
+→ DELETE
+
+
+In this code, we use it to perform login through an API.
+
+
+--------------------------------
+2. LOGIN PAYLOAD
+--------------------------------
+
+const loginPayload = {
+    userEmail: "anshika@gmail.com",
+    userPassword: "Iamking@000"
+};
+
+
+`loginPayload`
+
+→ Stores the login details that will be sent to the login API.
+
+
+The payload contains:
+
+userEmail
+    ↓
+Email
+
+
+userPassword
+    ↓
+Password
+
+
+This data will be sent to the API as the request body.
+
+
+--------------------------------
+3. TOKEN VARIABLE
+--------------------------------
+
+let token: string;
+
+
+This creates a variable named:
+
+token
+
+
+`string`
+
+→ Specifies that the token will contain string data.
+
+
+Initially:
+
+token
+ ↓
+undefined
+
+
+After successful API login:
+
+token
+ ↓
+Authentication token
+
+
+The token is declared outside the test because it needs to be
+available in the UI test later.
+
+
+--------------------------------
+4. test.beforeAll()
+--------------------------------
+
+test.beforeAll(async () => {
+
+
+`beforeAll()`
+
+→ Executes the code once before all tests in the test file.
+
+
+In this example, API login is performed before the UI test.
+
+
+Flow:
+
+Test execution starts
+        ↓
+beforeAll()
+        ↓
+API Login
+        ↓
+Get token
+        ↓
+UI test starts
+
+
+This avoids performing UI login every time.
+
+
+--------------------------------
+5. CREATE API REQUEST CONTEXT
+--------------------------------
+
+const apiContext = await request.newContext();
+
+
+`request.newContext()`
+
+→ Creates a new API request context.
+
+
+The API context allows Playwright to send API requests
+independently of the browser UI.
+
+
+Think of it as:
+
+Browser
+   ↓
+UI automation
+
+
+apiContext
+   ↓
+API automation
+
+
+--------------------------------
+6. SEND LOGIN REQUEST
+--------------------------------
+
+const loginResponse = await apiContext.post(
+    "https://rahulshettyacademy.com/api/ecom/auth/login",
+    {
+        data: loginPayload
+    }
+);
+
+
+`.post()`
+
+→ Sends an HTTP POST request to the login API.
+
+
+The URL:
+
+https://rahulshettyacademy.com/api/ecom/auth/login
+
+
+is the login API endpoint.
+
+
+`data: loginPayload`
+
+→ Sends the email and password as the request body.
+
+
+Flow:
+
+loginPayload
+     ↓
+POST request
+     ↓
+Login API
+     ↓
+API response
+
+
+--------------------------------
+7. VERIFY API LOGIN SUCCESS
+--------------------------------
+
+expect(loginResponse.ok()).toBeTruthy();
+
+
+`loginResponse.ok()`
+
+→ Checks whether the API response indicates a successful request.
+
+
+`toBeTruthy()`
+
+→ Verifies that the result is true.
+
+
+So this means:
+
+"Verify that the login API request was successful."
+
+
+If successful:
+
+true
+ ↓
+Assertion passes
+
+
+If unsuccessful:
+
+false
+ ↓
+Assertion fails
+
+
+--------------------------------
+8. GET API RESPONSE BODY
+--------------------------------
+
+const responseBody = await loginResponse.json();
+
+
+`.json()`
+
+→ Converts the API response body into a JavaScript object.
+
+
+For example, the API may return something similar to:
+
+{
+    token: "abc123...",
+    userId: "12345"
+}
+
+
+After:
+
+const responseBody = await loginResponse.json();
+
+
+we can access:
+
+responseBody.token
+
+responseBody.userId
+
+
+--------------------------------
+9. EXTRACT TOKEN
+--------------------------------
+
+token = responseBody.token;
+
+
+The authentication token returned by the API is extracted
+and stored in the `token` variable.
+
+
+Before:
+
+token
+ ↓
+undefined
+
+
+After:
+
+token
+ ↓
+"authentication-token"
+
+
+This token will later be used to authenticate the browser.
+
+
+--------------------------------
+10. EXTRACT USER ID
+--------------------------------
+
+const userId = responseBody.userId;
+
+
+The user ID is extracted from the API response.
+
+
+So:
+
+responseBody
+      ↓
+ ┌───────────────┐
+ │ token         │ → Authentication token
+ │ userId        │ → User ID
+ └───────────────┘
+
+
+In this code, the userId is only printed and is not used later.
+
+
+--------------------------------
+11. PRINT TOKEN AND USER ID
+--------------------------------
+
+console.log(token);
+console.log(userId);
+
+
+→ Prints the token and user ID in the console.
+
+
+This is mainly useful for learning/debugging.
+
+
+IMPORTANT:
+
+In real projects, avoid printing authentication tokens in logs
+because tokens are sensitive credentials.
+
+
+--------------------------------
+12. ADD TOKEN TO LOCAL STORAGE
+--------------------------------
+
+await page.addInitScript(value => {
+
+    window.localStorage.setItem('token', value);
+
+}, token);
+
+
+This is the most important new line in the UI test.
+
+
+`page.addInitScript()`
+
+→ Executes JavaScript before the page's own scripts run.
+
+
+Here, the script adds the authentication token to
+browser localStorage.
+
+
+--------------------------------
+13. UNDERSTANDING localStorage
+--------------------------------
+
+`localStorage`
+
+→ Browser storage used by web applications to store data
+that persists for the browser origin.
+
+
+In this application, the authentication token is stored as:
+
+token
+  ↓
+authentication token
+
+
+The application reads this token and recognizes the user
+as authenticated.
+
+
+--------------------------------
+14. UNDERSTANDING setItem()
+--------------------------------
+
+window.localStorage.setItem('token', value);
+
+
+`setItem()`
+
+→ Stores a key-value pair in localStorage.
+
+
+Here:
+
+Key:
+'token'
+
+
+Value:
+value
+
+
+So conceptually:
+
+localStorage
+
+token → authentication token
+
+
+--------------------------------
+15. WHERE DOES value COME FROM?
+--------------------------------
+
+The code is:
+
+await page.addInitScript(value => {
+
+    window.localStorage.setItem('token', value);
+
+}, token);
+
+
+The last argument:
+
+token
+
+
+is passed into the function as:
+
+value
+
+
+So:
+
+token
+  ↓
+value
+  ↓
+localStorage.setItem('token', value)
+
+
+You can think of it as:
+
+token = "ABC123"
+
+
+Then:
+
+value = "ABC123"
+
+
+And:
+
+localStorage.setItem('token', "ABC123");
+
+
+--------------------------------
+16. WHY addInitScript()?
+--------------------------------
+
+The application needs the token when it starts loading.
+
+
+`addInitScript()`
+
+→ Runs the script before the page's JavaScript starts.
+
+
+So the flow is:
+
+Create browser page
+       ↓
+Set token in localStorage
+       ↓
+Application loads
+       ↓
+Application reads token
+       ↓
+User is treated as authenticated
+
+
+This allows us to bypass the UI login.
+
+
+--------------------------------
+17. UI LOGIN IS NO LONGER REQUIRED
+--------------------------------
+
+Previously, the test used:
+
+await userName.fill(email);
+await password.fill('Iamking@000');
+await loginBtn.click();
+
+
+Now these lines are commented out.
+
+
+Instead:
+
+API Login
+    ↓
+Get token
+    ↓
+Store token in localStorage
+    ↓
+Open application
+    ↓
+Already authenticated
+
+
+This is called:
+
+TOKEN-BASED AUTHENTICATION
+
+
+--------------------------------
+18. page.goto() AFTER TOKEN INJECTION
+--------------------------------
+
+await page.goto("https://rahulshettyacademy.com/client");
+
+
+At this point, the token has already been added to localStorage.
+
+
+Therefore, when the application loads:
+
+Application
+    ↓
+Checks localStorage
+    ↓
+Finds token
+    ↓
+Recognizes authenticated user
+    ↓
+Loads application
+
+
+So we don't need to perform UI login.
+
+
+--------------------------------
+19. COMPLETE NEW FLOW
+--------------------------------
+
+BEFORE UI TEST:
+
+API Login
+    ↓
+POST login API
+    ↓
+Verify response
+    ↓
+Read JSON response
+    ↓
+Extract token
+    ↓
+Store token in variable
+
+
+THEN:
+
+Create browser page
+    ↓
+addInitScript()
+    ↓
+Store token in localStorage
+    ↓
+Open application
+    ↓
+Application recognizes token
+    ↓
+User is authenticated
+    ↓
+Continue UI automation
+
+
+--------------------------------
+20. API LOGIN VS UI LOGIN
+--------------------------------
+
+Traditional UI Login:
+
+Open Login Page
+      ↓
+Enter Username
+      ↓
+Enter Password
+      ↓
+Click Login
+      ↓
+Wait for application
+      ↓
+Continue test
+
+
+API Login:
+
+Send Login API request
+      ↓
+Get token
+      ↓
+Store token
+      ↓
+Open application
+      ↓
+Continue test
+
+
+The second approach can make tests faster because
+we don't need to perform the login UI steps.
+
+
+--------------------------------
+21. WHY IS THIS USEFUL?
+--------------------------------
+
+Token-based authentication is useful when:
+
+→ Login UI takes a long time
+→ Many tests need the same authenticated user
+→ We want to avoid repeating login steps
+→ We want faster test execution
+→ We want to combine API and UI testing
+
+
+Example:
+
+Instead of:
+
+Test 1 → UI Login
+Test 2 → UI Login
+Test 3 → UI Login
+Test 4 → UI Login
+
+
+We can:
+
+beforeAll()
+    ↓
+API Login once
+    ↓
+Get token
+    ↓
+Use token for UI tests
+
+
+--------------------------------
+22. NEW METHODS / CONCEPTS IN THIS CODE
+--------------------------------
+
+request.newContext()
+
+→ Creates an API request context.
+
+
+apiContext.post()
+
+→ Sends a POST API request.
+
+
+loginResponse.ok()
+
+→ Checks whether the API response was successful.
+
+
+loginResponse.json()
+
+→ Gets the response body as a JavaScript object.
+
+
+page.addInitScript()
+
+→ Executes JavaScript before the page's scripts.
+
+
+window.localStorage.setItem()
+
+→ Stores data in browser localStorage.
+
+
+--------------------------------
+23. KEY TAKEAWAY
+--------------------------------
+
+The main idea of this code is:
+
+API Login
+    ↓
+Get authentication token
+    ↓
+Store token
+    ↓
+Inject token into localStorage
+    ↓
+Open application
+    ↓
+Skip UI login
+    ↓
+Continue UI automation
+
+
+SHORT FORM:
+
+API
+ ↓
+Login
+ ↓
+Token
+ ↓
+localStorage
+ ↓
+Authenticated Browser
+ ↓
+UI Test
+
+--------------------------------
+PLAYWRIGHT API + UI HYBRID AUTOMATION
+--------------------------------
+
+This code demonstrates how to combine:
+
+→ API Testing
+→ UI Automation
+→ Authentication using Token
+→ Creating an order through API
+→ Extracting Order ID
+→ Validating the created order through UI
+
+The important NEW concepts are:
+
+→ orderPayload
+→ API POST for order creation
+→ headers
+→ Authorization
+→ Content-Type
+→ response.status()
+→ response.text()
+→ Extracting Order ID
+→ Using API-created data in UI validation
+
+
+--------------------------------
+1. ORDER PAYLOAD
+--------------------------------
+
+const orderPayload = {
+    orders: [
+        {
+            country: "Cuba",
+            productOrderedId: "6960eae1c941646b7a8b3ed3"
+        }
+    ]
+};
+
+
+`orderPayload`
+
+→ Contains the data required to create an order through the API.
+
+
+Here:
+
+country
+   ↓
+"Cuba"
+
+
+productOrderedId
+   ↓
+"6960eae1c941646b7a8b3ed3"
+
+
+The API will use this information to create the order.
+
+
+--------------------------------
+2. WHY DO WE NEED orderPayload?
+--------------------------------
+
+When we send a POST request to create an order,
+the API needs information about the order.
+
+
+We provide that information using:
+
+data: orderPayload
+
+
+Flow:
+
+orderPayload
+      ↓
+POST request
+      ↓
+Create Order API
+      ↓
+Order created
+
+
+--------------------------------
+3. orderId VARIABLE
+--------------------------------
+
+let orderId: string;
+
+
+This variable stores the Order ID returned by the API.
+
+
+Initially:
+
+orderId
+   ↓
+undefined
+
+
+After creating the order:
+
+orderId
+   ↓
+Created Order ID
+
+
+This Order ID will later be used to find the same order
+in the UI.
+
+
+--------------------------------
+4. API LOGIN
+--------------------------------
+
+const loginResponse = await apiContext.post(
+    "https://rahulshettyacademy.com/api/ecom/auth/login",
+    {
+        data: loginPayload
+    }
+);
+
+
+This is the same API login concept from the previous code.
+
+
+Flow:
+
+loginPayload
+      ↓
+POST Login API
+      ↓
+Login successful
+      ↓
+Response
+      ↓
+Extract token
+
+
+--------------------------------
+5. EXTRACT TOKEN
+--------------------------------
+
+const responseBody = await loginResponse.json();
+
+token = responseBody.token;
+
+
+The API returns the authentication token.
+
+
+The token is stored in:
+
+token
+
+
+This token is required to create the order.
+
+
+--------------------------------
+6. CREATE ORDER THROUGH API
+--------------------------------
+
+const orderResponse = await apiContext.post(
+    "https://rahulshettyacademy.com/api/ecom/order/create-order",
+    {
+        data: orderPayload,
+
+        headers: {
+            Authorization: token,
+            'Content-Type': 'application/json'
+        }
+    }
+);
+
+
+This is the MAIN NEW PART.
+
+
+Instead of creating the order through the UI:
+
+Select Product
+     ↓
+Add to Cart
+     ↓
+Checkout
+     ↓
+Select Country
+     ↓
+Place Order
+
+
+we create the order directly through the API.
+
+
+--------------------------------
+7. API ENDPOINT
+--------------------------------
+
+"https://rahulshettyacademy.com/api/ecom/order/create-order"
+
+
+This is the API endpoint used to create the order.
+
+
+The HTTP method is:
+
+POST
+
+
+because we are sending data to create a new order.
+
+
+--------------------------------
+8. data: orderPayload
+--------------------------------
+
+data: orderPayload
+
+
+This sends the order information to the API.
+
+
+Conceptually:
+
+POST Request
+
+{
+    country: "Cuba",
+    productOrderedId: "..."
+}
+
+
+The API receives this information and creates the order.
+
+
+--------------------------------
+9. HEADERS
+--------------------------------
+
+headers: {
+
+    Authorization: token,
+
+    'Content-Type': 'application/json'
+
+}
+
+
+Headers provide additional information to the server
+about the request.
+
+
+There are TWO important headers here:
+
+→ Authorization
+→ Content-Type
+
+
+--------------------------------
+10. Authorization HEADER
+--------------------------------
+
+Authorization: token
+
+
+The API needs to know:
+
+"Who is making this request?"
+
+
+The token obtained during login is sent with the request.
+
+
+Flow:
+
+Login API
+    ↓
+Token
+    ↓
+Authorization header
+    ↓
+Create Order API
+
+
+Without valid authentication, the API may reject the request.
+
+
+IMPORTANT:
+
+Different APIs use different authorization formats.
+
+This particular API expects the token directly in the
+`Authorization` header.
+
+
+--------------------------------
+11. Content-Type HEADER
+--------------------------------
+
+'Content-Type': 'application/json'
+
+
+This tells the server:
+
+"The request body is JSON data."
+
+
+Since:
+
+orderPayload
+
+contains JSON data, we specify:
+
+application/json
+
+
+So:
+
+Content-Type
+      ↓
+application/json
+      ↓
+Server knows request body format
+
+
+--------------------------------
+12. CHECK API STATUS
+--------------------------------
+
+console.log("Status:", orderResponse.status());
+
+
+`status()`
+
+→ Returns the HTTP status code of the response.
+
+
+For example:
+
+200
+201
+400
+401
+404
+500
+
+
+Example:
+
+Status: 201
+
+
+means the request was successful and a resource was created.
+
+
+The exact status depends on the API response.
+
+
+--------------------------------
+13. response.text()
+--------------------------------
+
+console.log("Response:", await orderResponse.text());
+
+
+`.text()`
+
+→ Gets the response body as plain text.
+
+
+This is useful for debugging because we can see
+exactly what the server returned.
+
+
+Example:
+
+Response:
+{
+    "orders": ["123456"]
+}
+
+
+IMPORTANT:
+
+`text()` gives the response as text/string.
+
+
+`json()` gives the response as a JavaScript object.
+
+
+--------------------------------
+14. text() vs json()
+--------------------------------
+
+`response.text()`
+
+→ Returns response body as text.
+
+
+`response.json()`
+
+→ Converts JSON response into a JavaScript object.
+
+
+Example response:
+
+{
+    "orders": ["12345"]
+}
+
+
+Using:
+
+await response.text()
+
+
+→ Gets the raw response text.
+
+
+Using:
+
+await response.json()
+
+
+→ Gets an object that can be accessed like:
+
+responseBody.orders
+
+
+--------------------------------
+15. VERIFY ORDER API RESPONSE
+--------------------------------
+
+expect(orderResponse.ok()).toBeTruthy();
+
+
+Same concept as login validation.
+
+
+`ok()`
+
+→ Checks whether the response was successful.
+
+
+If successful:
+
+true
+ ↓
+Assertion passes
+
+
+If unsuccessful:
+
+false
+ ↓
+Assertion fails
+
+
+--------------------------------
+16. GET ORDER RESPONSE BODY
+--------------------------------
+
+const orderResponseBody = await orderResponse.json();
+
+
+The JSON response is converted into a JavaScript object.
+
+
+For example:
+
+{
+    orders: [
+        "123456789"
+    ]
+}
+
+
+Now we can access the `orders` property.
+
+
+--------------------------------
+17. EXTRACT ORDER ID
+--------------------------------
+
+orderId = orderResponseBody.orders[0];
+
+
+This is another important NEW line.
+
+
+Suppose the API returns:
+
+{
+    orders: [
+        "123456789"
+    ]
+}
+
+
+Then:
+
+orderResponseBody.orders
+
+
+gives:
+
+[
+    "123456789"
+]
+
+
+And:
+
+orderResponseBody.orders[0]
+
+
+gives:
+
+"123456789"
+
+
+Because JavaScript uses zero-based indexing.
+
+
+So:
+
+[0]
+ ↓
+First order ID
+
+
+The value is stored in:
+
+orderId
+
+
+--------------------------------
+18. WHY STORE orderId?
+--------------------------------
+
+Because we need to verify that the order created through
+the API exists in the UI.
+
+
+Flow:
+
+API creates order
+       ↓
+Get Order ID
+       ↓
+Store orderId
+       ↓
+Open UI
+       ↓
+Go to My Orders
+       ↓
+Find same Order ID
+       ↓
+Open order details
+       ↓
+Verify Order ID
+
+
+This is the main purpose of the variable.
+
+
+--------------------------------
+19. CONSOLE LOGS
+--------------------------------
+
+console.log("Order Response:", orderResponseBody);
+
+console.log("Created Order ID:", orderId);
+
+console.log(orderResponseBody);
+
+
+These print the API response and Order ID to the console.
+
+
+They are mainly useful for:
+
+→ Debugging
+→ Understanding API response
+→ Confirming that order creation worked
+
+
+--------------------------------
+20. ADD TOKEN TO BROWSER
+--------------------------------
+
+await page.addInitScript(value => {
+
+    window.localStorage.setItem('token', value);
+
+}, token);
+
+
+This is from the previous code.
+
+
+The API login generated the token.
+
+
+The token is then placed into browser localStorage.
+
+
+Flow:
+
+API Login
+    ↓
+Token
+    ↓
+localStorage
+    ↓
+Open UI
+    ↓
+Authenticated user
+
+
+--------------------------------
+21. OPEN APPLICATION
+--------------------------------
+
+await page.goto("https://rahulshettyacademy.com/client");
+
+
+Because the token is already available in localStorage,
+the application can recognize the user as authenticated.
+
+
+No UI login is required.
+
+
+--------------------------------
+22. OPEN MY ORDERS
+--------------------------------
+
+await page.locator("button[routerlink*='myorders']").click();
+
+
+This clicks the My Orders button.
+
+
+Flow:
+
+Client Application
+      ↓
+My Orders
+      ↓
+Orders table
+
+
+--------------------------------
+23. WAIT FOR ORDERS TABLE
+--------------------------------
+
+await page.locator("tbody").waitFor();
+
+
+This waits for the `<tbody>` element to become visible.
+
+
+The order list is expected to appear inside the table body.
+
+
+So:
+
+tbody
+  ↓
+Wait until visible
+  ↓
+Continue test
+
+
+--------------------------------
+24. GET ALL ORDER ROWS
+--------------------------------
+
+const rows = page.locator("tbody tr");
+
+
+This locates all table rows inside the `<tbody>`.
+
+
+Structure:
+
+tbody
+ ├── tr → Order 1
+ ├── tr → Order 2
+ ├── tr → Order 3
+ └── tr → Order 4
+
+
+`rows`
+
+represents all these rows.
+
+
+--------------------------------
+25. GET NUMBER OF ROWS
+--------------------------------
+
+const rowCount = await rows.count();
+
+
+`count()`
+
+→ Returns the number of matching elements.
+
+
+For example:
+
+3 rows
+
+then:
+
+rowCount = 3
+
+
+This is used to control the loop.
+
+
+--------------------------------
+26. LOOP THROUGH ORDERS
+--------------------------------
+
+for (let i = 0; i < rowCount; ++i) {
+
+
+The loop checks every order row one by one.
+
+
+Example:
+
+i = 0 → First order
+i = 1 → Second order
+i = 2 → Third order
+...
+
+
+--------------------------------
+27. GET ORDER ID FROM EACH ROW
+--------------------------------
+
+const rowOrderId =
+    await rows.nth(i).locator("th").textContent();
+
+
+For the current row:
+
+rows.nth(i)
+
+
+→ Selects one order row.
+
+
+Then:
+
+locator("th")
+
+
+→ Finds the `<th>` containing the Order ID.
+
+
+Then:
+
+textContent()
+
+
+→ Gets the Order ID text.
+
+
+So:
+
+Current row
+    ↓
+Find th
+    ↓
+Get Order ID
+    ↓
+rowOrderId
+
+
+--------------------------------
+28. NULL CHECK
+--------------------------------
+
+if (rowOrderId && orderId.includes(rowOrderId)) {
+
+
+The first part:
+
+rowOrderId
+
+
+checks that `rowOrderId` has a value.
+
+
+Why?
+
+Because:
+
+textContent()
+
+can return `null`.
+
+
+So this:
+
+rowOrderId &&
+
+
+makes sure we only continue if an Order ID was actually found.
+
+
+--------------------------------
+29. includes()
+--------------------------------
+
+orderId.includes(rowOrderId)
+
+
+`includes()`
+
+→ Checks whether one string contains another string.
+
+
+Example:
+
+orderId = "123456789"
+
+rowOrderId = "123456789"
+
+
+Then:
+
+orderId.includes(rowOrderId)
+
+
+returns:
+
+true
+
+
+Flow:
+
+API Order ID
+     ↓
+Compare
+     ↓
+UI Order ID
+     ↓
+Match?
+     ↓
+YES → Open order
+
+
+--------------------------------
+30. CLICK ORDER DETAILS
+--------------------------------
+
+await rows.nth(i).locator("button").first().click();
+
+
+Once the matching Order ID is found:
+
+→ Find the button in that row
+→ Select the first button
+→ Click it
+
+
+This opens the order details page.
+
+
+Flow:
+
+Matching row
+     ↓
+Button
+     ↓
+Click
+     ↓
+Order Details
+
+
+--------------------------------
+31. break
+--------------------------------
+
+break;
+
+
+Once the matching order is found and clicked,
+there is no need to continue checking other rows.
+
+
+So:
+
+break
+
+
+→ Stops the loop immediately.
+
+
+Example:
+
+Order 1 → No
+Order 2 → No
+Order 3 → YES
+             ↓
+           Click
+             ↓
+           break
+             ↓
+       Exit loop
+
+
+--------------------------------
+32. GET ORDER ID FROM DETAILS PAGE
+--------------------------------
+
+const orderIdDetails =
+    await page.locator(".col-text").textContent();
+
+
+After opening the order details page,
+we extract the Order ID displayed there.
+
+
+The value is stored in:
+
+orderIdDetails
+
+
+Now we have:
+
+orderId
+     ↓
+Order ID obtained from API
+
+
+orderIdDetails
+     ↓
+Order ID obtained from UI
+
+
+--------------------------------
+33. FINAL VALIDATION
+--------------------------------
+
+expect(orderIdDetails).toBe(orderId);
+
+
+This verifies that:
+
+API Order ID
+      =
+UI Order ID
+
+
+If both are exactly the same:
+
+✅ Test passes
+
+
+If they are different:
+
+❌ Test fails
+
+
+This is the final validation of the test.
+
+
+--------------------------------
+34. COMPLETE TEST FLOW
+--------------------------------
+
+                    API SIDE
+                       ↓
+                 Login API
+                       ↓
+                 Get Token
+                       ↓
+              Create Order API
+                       ↓
+                Get Order ID
+                       ↓
+              Store orderId
+                       ↓
+        ─────────────────────────
+                       ↓
+                    UI SIDE
+                       ↓
+             Add token to storage
+                       ↓
+               Open application
+                       ↓
+                 My Orders
+                       ↓
+               Get order rows
+                       ↓
+              Loop through rows
+                       ↓
+             Find matching ID
+                       ↓
+               Click Details
+                       ↓
+             Get UI Order ID
+                       ↓
+               Compare IDs
+                       ↓
+                  PASS / FAIL
+
+
+--------------------------------
+35. API + UI HYBRID TESTING
+--------------------------------
+
+This test is an example of combining API and UI automation.
+
+
+API is used for:
+
+→ Login
+→ Authentication
+→ Creating the order
+→ Getting Order ID
+
+
+UI is used for:
+
+→ Opening application
+→ Opening My Orders
+→ Finding the order
+→ Opening order details
+→ Validating Order ID
+
+
+This approach avoids creating the order manually through
+multiple UI steps.
+
+
+--------------------------------
+36. PREVIOUS CODE vs CURRENT CODE
+--------------------------------
+
+PREVIOUS:
+
+API Login
+   ↓
+Get Token
+   ↓
+Open UI
+   ↓
+My Orders
+   ↓
+Validate existing order
+
+
+CURRENT:
+
+API Login
+   ↓
+Get Token
+   ↓
+Create Order through API
+   ↓
+Get NEW Order ID
+   ↓
+Open UI
+   ↓
+My Orders
+   ↓
+Find NEW Order
+   ↓
+Open Details
+   ↓
+Validate Order ID
+
+
+--------------------------------
+37. NEW CONCEPTS TO REMEMBER
+--------------------------------
+
+`orderPayload`
+
+→ Data required to create the order.
+
+
+`apiContext.post()`
+
+→ Sends POST request to create the order.
+
+
+`headers`
+
+→ Provides additional information about the request.
+
+
+`Authorization`
+
+→ Sends authentication token to the API.
+
+
+`Content-Type`
+
+→ Tells the server that the request body is JSON.
+
+
+`response.status()`
+
+→ Gets HTTP status code.
+
+
+`response.text()`
+
+→ Gets response body as text.
+
+
+`response.json()`
+
+→ Gets response body as JavaScript object.
+
+
+`orders[0]`
+
+→ Gets the first Order ID from the orders array.
+
+
+`includes()`
+
+→ Checks whether one string contains another string.
+
+
+`break`
+
+→ Stops the loop when the matching order is found.
+
+
+--------------------------------
+38. EASY WAY TO REMEMBER
+--------------------------------
+
+LOGIN:
+
+API
+ ↓
+Username + Password
+ ↓
+Token
+
+
+CREATE ORDER:
+
+Token
+ ↓
+Order Payload
+ ↓
+POST Order API
+ ↓
+Order ID
+
+
+VALIDATE:
+
+Order ID from API
+        ↓
+Find same Order ID in UI
+        ↓
+Open Order Details
+        ↓
+Compare Order IDs
+
+
+--------------------------------
+39. KEY TAKEAWAY
+--------------------------------
+
+The most important concept in this code is:
+
+API creates the data
+        ↓
+UI validates the data
+
+
+In this example:
+
+API
+ ↓
+Create Order
+ ↓
+Get Order ID
+ ↓
+UI
+ ↓
+Find Order
+ ↓
+Verify Order ID
+
+
+This is called a **hybrid API + UI automation approach** and is
+very useful when we want to use APIs to prepare test data and
+then use the UI to validate the application's behavior.
