@@ -21,6 +21,161 @@ This code demonstrates how to:
 
 
 --------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { expect, test, request } from "@playwright/test";
+
+const loginPayload = {
+    userEmail: "anshika@gmail.com",
+    userPassword: "Iamking@000"
+};
+
+let token: string;
+
+test.beforeAll(async () => {
+
+    // Create API request context
+    const apiContext = await request.newContext();
+
+    // Login through API
+    const loginResponse = await apiContext.post(
+        "https://rahulshettyacademy.com/api/ecom/auth/login",
+        {
+            data: loginPayload
+        }
+    );
+
+    // Verify API login is successful
+    expect(loginResponse.ok()).toBeTruthy();
+
+    // Get response body
+    const responseBody = await loginResponse.json();
+
+    // Extract token
+    token = responseBody.token;
+
+    console.log("Token:", token);
+});
+
+
+test("API Login + UI Automation", async ({ page }) => {
+
+    // Add token to browser localStorage
+    await page.addInitScript((value) => {
+
+        window.localStorage.setItem("token", value);
+
+    }, token);
+
+
+    // Open application
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await page.waitForLoadState("networkidle");
+
+
+    // Get all products
+    const products = page.locator(".card-body");
+
+    const productCount = await products.count();
+
+    console.log("Total Products:", productCount);
+
+
+    // Find ZARA COAT 3
+    for (let i = 0; i < productCount; i++) {
+
+        const productName =
+            await products.nth(i).locator("b").textContent();
+
+        console.log("Product:", productName);
+
+        if (productName?.trim() === "ZARA COAT 3") {
+
+            // Add product to cart
+            await products.nth(i).locator("text= Add To Cart").click();
+
+            break;
+        }
+    }
+
+
+    // Open Cart
+    await page.locator("[routerlink*='cart']").click();
+
+    await page.waitForLoadState("networkidle");
+
+
+    // Verify product is available in cart
+    await expect(
+        page.locator("h3:has-text('ZARA COAT 3')")
+    ).toBeVisible();
+
+
+    // Click Checkout
+    await page.getByRole("button", { name: "Checkout" }).click();
+
+
+    // Select country
+    await page
+        .locator("[placeholder*='Select Country']")
+        .pressSequentially("ind", { delay: 100 });
+
+
+    // Wait for country dropdown
+    const dropdown = page.locator(".ta-results");
+
+    await dropdown.waitFor();
+
+
+    // Get country options
+    const optionsCount =
+        await dropdown.locator("button").count();
+
+
+    // Select India
+    for (let i = 0; i < optionsCount; i++) {
+
+        const country =
+            await dropdown.locator("button").nth(i).textContent();
+
+        if (country?.trim() === "India") {
+
+            await dropdown.locator("button").nth(i).click();
+
+            break;
+        }
+    }
+
+
+    // Verify logged-in user's email
+    await expect(
+        page.locator(".user__name [type='text']")
+    ).toHaveValue("anshika@gmail.com");
+
+
+    // Place order
+    await page.getByText("Place Order").click();
+
+
+    // Verify order confirmation
+    await expect(
+        page.locator(".hero-primary")
+    ).toContainText("Thankyou for the order.");
+
+
+    // Get Order ID
+    const orderId =
+        await page
+            .locator(".em-spacer-1 .ng-star-inserted")
+            .textContent();
+
+    console.log("Order ID:", orderId);
+});
+
+
+--------------------------------
 1. IMPORT request
 --------------------------------
 

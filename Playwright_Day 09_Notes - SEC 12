@@ -1,0 +1,3407 @@
+--------------------------------
+DAY 09 — 09/19 — SATURDAY
+--------------------------------
+
+--------------
+SECTION 12
+--------------
+
+--------------------------------
+PLAYWRIGHT STORAGE STATE
+--------------------------------
+
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+let webContext: any;
+
+test.beforeAll(async ({ browser }) => {
+
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // Login
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await page.locator('#userEmail').fill('anshika@gmail.com');
+    await page.locator('#userPassword').fill('Iamking@000');
+    await page.locator('#login').click();
+
+    await page.waitForLoadState('networkidle');
+
+    // Save login session
+    await context.storageState({ path: 'state.json' });
+
+    // Create new context using saved login session
+    webContext = await browser.newContext({
+        storageState: 'state.json'
+    });
+});
+
+
+test('Automate e-Commerce website', async () => {
+
+    const page = await webContext.newPage();
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await page.waitForLoadState('networkidle');
+
+    // Get all products
+    const products = page.locator('.card-body');
+
+    const productCount = await products.count();
+
+    console.log("Total Products:", productCount);
+
+    // Find ZARA COAT 3 and add to cart
+    for (let i = 0; i < productCount; i++) {
+
+        const productName = await products.nth(i).locator('b').textContent();
+
+        console.log(productName);
+
+        if (productName?.trim() === "ZARA COAT 3") {
+
+            await products.nth(i).locator("text= Add To Cart").click();
+
+            break;
+        }
+    }
+
+    // Go to Cart
+    await page.locator("[routerlink*='cart']").click();
+
+    await page.waitForLoadState('networkidle');
+
+    // Verify product is added to cart
+    const cartProduct = page.locator("h3:has-text('ZARA COAT 3')");
+
+    await expect(cartProduct).toBeVisible();
+
+    // Click Checkout
+    await page.getByRole('button', { name: 'Checkout' }).click();
+
+    // Enter country
+    await page
+        .locator("[placeholder*='Select Country']")
+        .pressSequentially("ind", { delay: 100 });
+
+    const dropdown = page.locator(".ta-results");
+
+    await dropdown.waitFor();
+
+    const optionsCount = await dropdown.locator("button").count();
+
+    for (let i = 0; i < optionsCount; i++) {
+
+        const country = await dropdown.locator("button").nth(i).textContent();
+
+        if (country?.trim() === "India") {
+
+            await dropdown.locator("button").nth(i).click();
+
+            break;
+        }
+    }
+
+    // Verify email
+    await expect(
+        page.locator(".user__name [type='text']")
+    ).toHaveValue("anshika@gmail.com");
+
+    // Place Order
+    await page.getByText("Place Order").click();
+
+    // Verify order confirmation
+    await expect(
+        page.locator(".hero-primary")
+    ).toContainText("Thankyou for the order.");
+
+    // Get Order ID
+    const orderId = await page
+        .locator(".em-spacer-1 .ng-star-inserted")
+        .textContent();
+
+    console.log("Order ID:", orderId);
+
+});
+
+
+test('Test case 2', async () => {
+
+    const page = await webContext.newPage();
+
+    await page.goto("https://rahulshettyacademy.com/client");
+
+    await page.waitForLoadState('networkidle');
+
+    // Get all product titles
+    const products = page.locator('.card-body');
+
+    const titles = await products.locator('b').allTextContents();
+
+    console.log("Product Titles:");
+
+    for (let i = 0; i < titles.length; i++) {
+
+        console.log(titles[i]);
+    }
+
+});
+
+
+--------------------------------
+NEW CODE EXPLANATION
+--------------------------------
+
+1. webContext
+
+let webContext: any;
+
+
+→ Stores the authenticated browser context.
+
+Initially:
+
+webContext
+    ↓
+undefined
+
+
+After login and loading state:
+
+webContext
+    ↓
+Authenticated context
+
+
+--------------------------------
+2. browser.newContext()
+
+const context = await browser.newContext();
+
+
+→ Creates a new isolated browser context.
+
+Think:
+
+Browser
+   ↓
+Context
+   ↓
+Page
+
+
+--------------------------------
+3. context.newPage()
+
+const page = await context.newPage();
+
+
+→ Creates a new page inside the context.
+
+
+Flow:
+
+Browser
+   ↓
+Context
+   ↓
+Page
+
+
+--------------------------------
+4. UI LOGIN
+
+await page.locator('#userEmail').fill('anshika@gmail.com');
+
+await page.locator("#userPassword").fill('Iamking@000');
+
+await page.locator('#login').click();
+
+
+→ Performs the login through the UI.
+
+
+Flow:
+
+Email
+  ↓
+Password
+  ↓
+Login
+  ↓
+Authenticated
+
+
+--------------------------------
+5. SAVE LOGIN STATE
+
+await context.storageState({
+    path: 'state.json'
+});
+
+
+→ Saves the current authentication/storage state into:
+
+state.json
+
+
+Conceptually:
+
+Logged-in Context
+       ↓
+storageState()
+       ↓
+state.json
+
+
+The saved state can contain authentication-related browser
+storage such as cookies and local storage.
+
+
+--------------------------------
+6. CREATE AUTHENTICATED CONTEXT
+
+webContext = await browser.newContext({
+    storageState: 'state.json'
+});
+
+
+→ Creates a new browser context using the saved state.
+
+
+Flow:
+
+state.json
+    ↓
+browser.newContext()
+    ↓
+webContext
+    ↓
+Already authenticated
+
+
+--------------------------------
+7. CREATE PAGE FROM webContext
+
+const page = await webContext.newPage();
+
+
+→ Creates a new page inside the authenticated context.
+
+
+Because `webContext` already contains the saved authentication
+state, the test does not need to perform login again.
+
+
+--------------------------------
+8. TEST CASE 1
+
+test('Automate e-Commerce website', async () => {
+
+    const page = await webContext.newPage();
+
+});
+
+
+The important difference is:
+
+❌ No UI login
+
+Instead:
+
+webContext
+    ↓
+newPage()
+    ↓
+Already logged in
+
+
+--------------------------------
+9. TEST CASE 2
+
+test('Test case 2', async () => {
+
+    const page = await webContext.newPage();
+
+});
+
+
+The same authenticated context can be reused for another test.
+
+
+So:
+
+state.json
+    ↓
+webContext
+    ↓
+    ├── Test 1 Page
+    │
+    └── Test 2 Page
+
+
+--------------------------------
+10. COMPLETE FLOW
+--------------------------------
+
+BEFORE ALL:
+
+Create Context
+      ↓
+Create Page
+      ↓
+UI Login
+      ↓
+Save storage state
+      ↓
+state.json
+      ↓
+Create webContext
+
+
+TEST 1:
+
+webContext
+    ↓
+newPage()
+    ↓
+Already authenticated
+    ↓
+Test execution
+
+
+TEST 2:
+
+webContext
+    ↓
+newPage()
+    ↓
+Already authenticated
+    ↓
+Test execution
+
+
+--------------------------------
+11. EASY WAY TO REMEMBER
+--------------------------------
+
+LOGIN ONCE
+
+UI Login
+   ↓
+Save State
+   ↓
+state.json
+
+
+REUSE
+
+state.json
+   ↓
+webContext
+   ↓
+newPage()
+   ↓
+No Login Required
+
+
+--------------------------------
+12. KEY TAKEAWAY
+--------------------------------
+
+`storageState()`
+
+→ Saves the authentication/browser storage state.
+
+
+`storageState: 'state.json'`
+
+→ Loads the saved state into a new browser context.
+
+
+`webContext.newPage()`
+
+→ Creates a new page using that authenticated context.
+
+
+MAIN IDEA:
+
+Login once
+    ↓
+Save state
+    ↓
+Reuse state
+    ↓
+Multiple tests
+    ↓
+No repeated login
+
+--------------------------------
+DAY 09 — API MOCKING
+--------------------------------
+
+--------------------------------
+TOPIC
+--------------------------------
+
+API MOCKING / API INTERCEPTION
+USING PLAYWRIGHT
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { expect, test, request } from "@playwright/test";
+import { APIUtils } from "./utils/APIUtils";
+
+
+const loginPayload = {
+    userEmail: "anshika@gmail.com",
+    userPassword: "Iamking@000"
+};
+
+
+const orderPayload = {
+    orders: [{
+        country: "India",
+        productOrderedId: "6960eae1c941646b7a8b3ed3"
+    }]
+};
+
+
+const fakePayloadOrder = {
+    data: [],
+    message: "No Orders"
+};
+
+
+let apiResponse: any;
+
+
+test.beforeAll(async () => {
+
+    // Create API request context
+    const apiContext = await request.newContext();
+
+    // Create APIUtils object
+    const apiUtils = new APIUtils(
+        apiContext,
+        loginPayload
+    );
+
+    // Login through API and create order
+    apiResponse = await apiUtils.createOrder(
+        orderPayload
+    );
+
+});
+
+
+test("Placing Order", async ({ page }) => {
+
+    // Set token in browser localStorage
+    await page.addInitScript(value => {
+
+        window.localStorage.setItem(
+            "token",
+            value
+        );
+
+    }, apiResponse.token);
+
+
+    // Open application
+    await page.goto(
+        "https://rahulshettyacademy.com/client"
+    );
+
+
+    // Intercept Get Orders API
+    await page.route(
+        "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
+        async route => {
+
+            // Send original request to server
+            const response =
+                await page.request.fetch(
+                    route.request()
+                );
+
+
+            // Create fake response body
+            const body =
+                JSON.stringify(fakePayloadOrder);
+
+
+            // Send fake response to browser
+            await route.fulfill({
+                response,
+                body
+            });
+
+        }
+    );
+
+
+    // Go to My Orders
+    await page
+        .locator("button[routerlink*='myorders']")
+        .click();
+
+
+    // Wait for Get Orders API response
+    await page.waitForResponse(
+        "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*"
+    );
+
+
+    // Print message displayed in UI
+    console.log(
+        await page.locator(".mt-4").textContent()
+    );
+
+}
+
+
+--------------------------------
+1. IMPORT APIUtils
+--------------------------------
+
+import { APIUtils } from "./utils/APIUtils";
+
+
+APIUtils is our custom utility class.
+
+It contains reusable API-related methods such as:
+
+→ Login
+→ Get Token
+→ Create Order
+
+Instead of writing all API code inside the test,
+we reuse the APIUtils class.
+
+Flow:
+
+Test
+ ↓
+APIUtils
+ ↓
+Login API
+ ↓
+Create Order API
+ ↓
+Return Response
+
+
+--------------------------------
+2. LOGIN PAYLOAD
+--------------------------------
+
+const loginPayload = {
+    userEmail: "anshika@gmail.com",
+    userPassword: "Iamking@000"
+};
+
+
+loginPayload
+
+→ Contains the login information.
+
+It contains:
+
+userEmail
+    ↓
+Email
+
+userPassword
+    ↓
+Password
+
+
+This information is passed to the Login API.
+
+
+--------------------------------
+3. ORDER PAYLOAD
+--------------------------------
+
+const orderPayload = {
+    orders: [{
+        country: "India",
+        productOrderedId: "6960eae1c941646b7a8b3ed3"
+    }]
+};
+
+
+orderPayload
+
+→ Contains the information required
+  to create an order.
+
+It contains:
+
+country
+   ↓
+India
+
+productOrderedId
+   ↓
+Product ID
+
+
+Flow:
+
+orderPayload
+     ↓
+Create Order API
+     ↓
+Order Created
+
+
+--------------------------------
+4. FAKE RESPONSE PAYLOAD
+--------------------------------
+
+const fakePayloadOrder = {
+    data: [],
+    message: "No Orders"
+};
+
+
+This is the fake response that we want
+the browser to receive.
+
+Normally:
+
+API
+ ↓
+Actual Orders
+ ↓
+UI
+
+
+But here we want to simulate:
+
+API
+ ↓
+No Orders
+ ↓
+UI
+
+
+The fake response is:
+
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+This helps us test the application when
+there are no orders.
+
+
+--------------------------------
+5. API RESPONSE VARIABLE
+--------------------------------
+
+let apiResponse: any;
+
+
+This variable stores the response returned by:
+
+apiUtils.createOrder(orderPayload);
+
+
+For example:
+
+apiResponse
+     ↓
+token
+orderId
+other response data
+
+
+Later we use:
+
+apiResponse.token
+
+
+to authenticate the browser.
+
+
+--------------------------------
+6. test.beforeAll()
+--------------------------------
+
+test.beforeAll(async () => {
+
+    const apiContext = await request.newContext();
+
+    const apiUtils = new APIUtils(
+        apiContext,
+        loginPayload
+    );
+
+    apiResponse = await apiUtils.createOrder(
+        orderPayload
+    );
+
+});
+
+
+beforeAll()
+
+→ Executes once before all tests.
+
+
+Flow:
+
+Test execution
+      ↓
+beforeAll()
+      ↓
+Create API Context
+      ↓
+Create APIUtils object
+      ↓
+Login through API
+      ↓
+Create Order through API
+      ↓
+Store API Response
+      ↓
+UI Test starts
+
+
+--------------------------------
+7. request.newContext()
+--------------------------------
+
+const apiContext = await request.newContext();
+
+
+Creates an API request context.
+
+It allows Playwright to send API requests
+without using the browser UI.
+
+Think:
+
+Browser
+   ↓
+UI Automation
+
+apiContext
+   ↓
+API Automation
+
+
+--------------------------------
+8. CREATE APIUtils OBJECT
+--------------------------------
+
+const apiUtils = new APIUtils(
+    apiContext,
+    loginPayload
+);
+
+
+Creates an object of the APIUtils class.
+
+We pass:
+
+apiContext
+     ↓
+API request context
+
+loginPayload
+     ↓
+Username + Password
+
+
+The APIUtils class can now use these values
+to perform API operations.
+
+
+--------------------------------
+9. CREATE ORDER THROUGH API
+--------------------------------
+
+apiResponse = await apiUtils.createOrder(
+    orderPayload
+);
+
+
+The createOrder() method performs the
+API login and order creation.
+
+Flow:
+
+loginPayload
+     ↓
+Login API
+     ↓
+Token
+     ↓
+orderPayload
+     ↓
+Create Order API
+     ↓
+API Response
+     ↓
+apiResponse
+
+
+--------------------------------
+10. SET TOKEN IN LOCAL STORAGE
+--------------------------------
+
+await page.addInitScript(value => {
+
+    window.localStorage.setItem(
+        "token",
+        value
+    );
+
+}, apiResponse.token);
+
+
+This is the same token-based authentication
+concept learned previously.
+
+
+apiResponse.token
+       ↓
+addInitScript()
+       ↓
+localStorage
+       ↓
+token
+       ↓
+Authenticated Browser
+
+
+--------------------------------
+11. page.addInitScript()
+--------------------------------
+
+page.addInitScript()
+
+
+→ Executes JavaScript before the page's
+  own JavaScript starts running.
+
+
+Here we use it to store the authentication
+token in localStorage.
+
+
+Flow:
+
+Create Page
+    ↓
+Add Token
+    ↓
+Application Starts
+    ↓
+Application Reads Token
+    ↓
+User Authenticated
+
+
+--------------------------------
+12. localStorage.setItem()
+--------------------------------
+
+window.localStorage.setItem(
+    "token",
+    value
+);
+
+
+setItem()
+
+→ Stores a key-value pair in localStorage.
+
+
+Here:
+
+Key
+ ↓
+"token"
+
+
+Value
+ ↓
+Authentication Token
+
+
+So:
+
+localStorage
+
+token
+ ↓
+Authentication Token
+
+
+--------------------------------
+13. OPEN APPLICATION
+--------------------------------
+
+await page.goto(
+    "https://rahulshettyacademy.com/client"
+);
+
+
+The application is opened after the
+authentication token has been added.
+
+
+Flow:
+
+Token
+ ↓
+localStorage
+ ↓
+page.goto()
+ ↓
+Application
+ ↓
+Authenticated User
+
+
+No UI login is required.
+
+
+--------------------------------
+14. page.route()
+--------------------------------
+
+await page.route(
+    "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
+    async route => {
+
+    }
+);
+
+
+THIS IS THE MAIN NEW CONCEPT.
+
+
+page.route()
+
+→ Used to intercept network requests
+  made by the browser.
+
+
+Normally:
+
+Browser
+   ↓
+API Request
+   ↓
+Server
+   ↓
+Response
+   ↓
+Browser
+
+
+With page.route():
+
+Browser
+   ↓
+API Request
+   ↓
+Playwright intercepts
+   ↓
+Modify / Mock response
+   ↓
+Browser
+
+
+--------------------------------
+15. WHY ARE WE INTERCEPTING THIS API?
+--------------------------------
+
+The application sends this API request
+when we open My Orders:
+
+get-orders-for-customer/*
+
+
+Normally the API may return:
+
+Orders
+ ↓
+Order 1
+Order 2
+Order 3
+
+
+But we want to test:
+
+No Orders
+
+
+Therefore we intercept the API request
+and provide a fake response.
+
+
+--------------------------------
+16. `*` IN THE URL
+--------------------------------
+
+"https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*"
+
+
+The `*` means that the remaining part
+of the URL can be different.
+
+
+For example:
+
+/get-orders-for-customer/12345
+
+/get-orders-for-customer/67890
+
+
+Both can match:
+
+/get-orders-for-customer/*
+
+
+--------------------------------
+17. route
+--------------------------------
+
+async route => {
+
+
+route
+
+→ Represents the intercepted request.
+
+
+Playwright gives us the route object
+so that we can decide what to do
+with the request.
+
+
+We can:
+
+→ Continue the request
+→ Modify the request
+→ Mock the response
+→ Fulfill the request
+
+
+--------------------------------
+18. route.request()
+--------------------------------
+
+route.request()
+
+
+→ Gets the original request that the
+  browser was trying to send.
+
+
+Flow:
+
+Browser
+   ↓
+Original API Request
+   ↓
+page.route()
+   ↓
+route.request()
+   ↓
+Original Request
+
+
+--------------------------------
+19. page.request.fetch()
+--------------------------------
+
+const response =
+    await page.request.fetch(
+        route.request()
+    );
+
+
+This sends the original request
+to the real server.
+
+
+Flow:
+
+Browser
+   ↓
+page.route()
+   ↓
+Intercept Request
+   ↓
+page.request.fetch()
+   ↓
+Real Server
+   ↓
+Real Response
+
+
+So we are still calling the actual API,
+but we will replace its response body later.
+
+
+--------------------------------
+20. WHY DO WE USE page.request.fetch()?
+--------------------------------
+
+We use:
+
+page.request.fetch(route.request())
+
+
+to get the original response.
+
+
+This allows us to keep the original
+response information and only change
+the response body.
+
+
+Conceptually:
+
+Original Request
+      ↓
+Real Server
+      ↓
+Original Response
+      ↓
+Modify Response Body
+      ↓
+Send to Browser
+
+
+--------------------------------
+21. JSON.stringify()
+--------------------------------
+
+const body =
+    JSON.stringify(fakePayloadOrder);
+
+
+fakePayloadOrder is a JavaScript object:
+
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+JSON.stringify()
+
+→ Converts a JavaScript object into
+  a JSON string.
+
+
+Flow:
+
+JavaScript Object
+       ↓
+JSON.stringify()
+       ↓
+JSON String
+
+
+Example:
+
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+becomes:
+
+{"data":[],"message":"No Orders"}
+
+
+--------------------------------
+22. route.fulfill()
+--------------------------------
+
+await route.fulfill({
+    response,
+    body
+});
+
+
+THIS IS ANOTHER IMPORTANT NEW CONCEPT.
+
+
+route.fulfill()
+
+→ Sends a response back to the browser.
+
+
+Instead of allowing the browser to
+receive the original response,
+we provide our mocked response.
+
+
+Flow:
+
+API Request
+     ↓
+page.route()
+     ↓
+Intercept
+     ↓
+Get Original Response
+     ↓
+Create Fake Body
+     ↓
+route.fulfill()
+     ↓
+Browser receives response
+
+
+--------------------------------
+23. response
+--------------------------------
+
+response
+
+
+This is the response received from
+the real server.
+
+It was created using:
+
+const response =
+    await page.request.fetch(
+        route.request()
+    );
+
+
+We pass it to:
+
+route.fulfill({
+    response,
+    body
+});
+
+
+So Playwright can keep the response
+details while replacing the body.
+
+
+--------------------------------
+24. body
+--------------------------------
+
+body
+
+
+This contains our fake response.
+
+It was created using:
+
+const body =
+    JSON.stringify(fakePayloadOrder);
+
+
+So:
+
+body
+ ↓
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+--------------------------------
+25. COMPLETE MOCKING LOGIC
+--------------------------------
+
+Browser sends API request
+          ↓
+     page.route()
+          ↓
+      Intercept
+          ↓
+   route.request()
+          ↓
+   Original Request
+          ↓
+page.request.fetch()
+          ↓
+     Real Server
+          ↓
+   Original Response
+          ↓
+ Create Fake Response Body
+          ↓
+     route.fulfill()
+          ↓
+      Browser
+          ↓
+       UI
+
+
+--------------------------------
+26. GO TO MY ORDERS
+--------------------------------
+
+await page
+    .locator("button[routerlink*='myorders']")
+    .click();
+
+
+This clicks the My Orders button.
+
+
+After clicking My Orders,
+the application sends:
+
+GET
+
+get-orders-for-customer/*
+
+
+Our page.route() is already waiting
+for this request.
+
+
+Flow:
+
+Click My Orders
+      ↓
+Application sends API request
+      ↓
+page.route() intercepts
+      ↓
+Fake response returned
+      ↓
+UI displays No Orders
+
+
+--------------------------------
+27. waitForResponse()
+--------------------------------
+
+await page.waitForResponse(
+    "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*"
+);
+
+
+waitForResponse()
+
+→ Waits until the specified API
+  response is received.
+
+
+Flow:
+
+Click My Orders
+      ↓
+API Request
+      ↓
+API Response
+      ↓
+waitForResponse()
+      ↓
+Continue Test
+
+
+--------------------------------
+28. WHY DO WE USE waitForResponse()?
+--------------------------------
+
+The UI needs the API response before
+it can display the order information.
+
+
+So we wait for the response before
+continuing with the test.
+
+
+It helps us synchronize the test
+with the API call.
+
+
+--------------------------------
+29. GET UI MESSAGE
+--------------------------------
+
+console.log(
+    await page.locator(".mt-4").textContent()
+);
+
+
+This gets the text displayed by the UI.
+
+
+Because we mocked the API response:
+
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+the application should display the
+corresponding No Orders message.
+
+
+textContent()
+
+→ Gets the text from the element.
+
+
+--------------------------------
+30. REAL API VS MOCKED API
+--------------------------------
+
+WITHOUT MOCKING:
+
+Browser
+   ↓
+GET Orders API
+   ↓
+Real Server
+   ↓
+Actual Orders
+   ↓
+UI
+
+
+WITH MOCKING:
+
+Browser
+   ↓
+GET Orders API
+   ↓
+page.route()
+   ↓
+Intercept
+   ↓
+Fake Response
+   ↓
+route.fulfill()
+   ↓
+UI
+
+
+--------------------------------
+31. WHY DO WE USE API MOCKING?
+--------------------------------
+
+API mocking is useful when we want to
+test different backend scenarios.
+
+
+Examples:
+
+→ No Orders
+→ Empty Response
+→ Error Response
+→ Invalid Response
+→ Specific Test Data
+→ Unavailable Backend
+
+
+In this example:
+
+API Response:
+
+data = []
+
+message = "No Orders"
+
+
+Then we verify that the UI correctly
+handles this response.
+
+
+--------------------------------
+32. API MOCKING VS REAL API
+--------------------------------
+
+REAL API:
+
+Real Backend
+     ↓
+Real Data
+     ↓
+UI
+
+
+MOCK API:
+
+Mocked Response
+     ↓
+UI
+
+
+The main advantage is that we can
+control what data the UI receives.
+
+
+--------------------------------
+33. COMPLETE TEST FLOW
+--------------------------------
+
+BEFORE TEST:
+
+test.beforeAll()
+      ↓
+Create API Context
+      ↓
+Create APIUtils
+      ↓
+Login through API
+      ↓
+Create Order through API
+      ↓
+Store API Response
+
+
+UI TEST:
+
+apiResponse.token
+      ↓
+Add token to localStorage
+      ↓
+Open Application
+      ↓
+Set API Route
+      ↓
+Click My Orders
+      ↓
+Application sends Get Orders API
+      ↓
+page.route() intercepts
+      ↓
+Fetch original response
+      ↓
+Create fake response
+      ↓
+route.fulfill()
+      ↓
+Browser receives fake response
+      ↓
+UI displays No Orders
+      ↓
+Verify / Print UI message
+
+
+--------------------------------
+34. API + UI + MOCKING
+--------------------------------
+
+This test combines three concepts:
+
+1. API Automation
+2. UI Automation
+3. API Mocking
+
+
+API Automation
+      ↓
+Login + Create Order
+      ↓
+Token
+      ↓
+UI Authentication
+      ↓
+UI Automation
+      ↓
+My Orders
+      ↓
+API Interception
+      ↓
+Mock Response
+      ↓
+UI Validation
+
+
+--------------------------------
+35. NEW METHODS / CONCEPTS
+--------------------------------
+
+APIUtils
+
+→ Reusable class for API operations.
+
+
+request.newContext()
+
+→ Creates API request context.
+
+
+page.addInitScript()
+
+→ Executes JavaScript before page scripts.
+
+
+localStorage.setItem()
+
+→ Stores authentication token.
+
+
+page.route()
+
+→ Intercepts network request.
+
+
+route.request()
+
+→ Gets original intercepted request.
+
+
+page.request.fetch()
+
+→ Sends the original request to
+  the actual server.
+
+
+JSON.stringify()
+
+→ Converts JavaScript object into
+  JSON string.
+
+
+route.fulfill()
+
+→ Sends a mocked/custom response
+  to the browser.
+
+
+page.waitForResponse()
+
+→ Waits for a specific API response.
+
+
+textContent()
+
+→ Gets text from the UI element.
+
+
+--------------------------------
+36. EASY WAY TO REMEMBER
+--------------------------------
+
+API MOCKING:
+
+REQUEST
+   ↓
+INTERCEPT
+   ↓
+FETCH
+   ↓
+MODIFY
+   ↓
+FULFILL
+   ↓
+UI
+
+
+Short form:
+
+page.route()
+     ↓
+Intercept
+     ↓
+route.request()
+     ↓
+page.request.fetch()
+     ↓
+Fake Body
+     ↓
+route.fulfill()
+     ↓
+UI
+
+
+--------------------------------
+37. KEY TAKEAWAY
+--------------------------------
+
+The main concept of this test is:
+
+API REQUEST
+      ↓
+INTERCEPT USING page.route()
+      ↓
+GET ORIGINAL RESPONSE
+      ↓
+CREATE FAKE RESPONSE
+      ↓
+route.fulfill()
+      ↓
+UI RECEIVES MOCKED RESPONSE
+      ↓
+VALIDATE UI
+
+
+In this example:
+
+Real API:
+
+Get Orders
+
+
+Mocked Response:
+
+{
+    data: [],
+    message: "No Orders"
+}
+
+
+Therefore:
+
+API Mocking
+     ↓
+Simulate "No Orders"
+     ↓
+UI receives fake response
+     ↓
+Verify UI behavior
+
+
+--------------------------------
+38. INTERVIEW ONE-LINER
+--------------------------------
+
+"In Playwright, I use page.route() to intercept API requests and route.fulfill() to provide a mocked response. 
+This helps me test different backend scenarios such as empty responses, error responses, or specific test data 
+without depending completely on the real backend."
+
+
+--------------------------------
+END
+--------------------------------
+
+--------------------------------
+TOPIC
+--------------------------------
+
+SECURITY TESTING USING
+REQUEST INTERCEPTION
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from "@playwright/test";
+
+
+test("security test request interception", async ({ page }) => {
+
+    const userName = page.locator('#userEmail');
+    const password = page.locator("#userPassword");
+    const loginBtn = page.locator('#login');
+    const email = "anshika@gmail.com";
+
+
+    await page.goto(
+        "https://rahulshettyacademy.com/client"
+    );
+
+
+    await userName.fill(email);
+
+    await password.fill('Iamking@000');
+
+    await loginBtn.click();
+
+
+    await page.waitForLoadState('networkidle');
+
+    await page
+        .locator('.card-body b')
+        .first()
+        .waitFor();
+
+
+    await page
+        .locator("button[routerlink*='myorders']")
+        .click();
+
+
+    await page.route(
+        "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=*",
+        route => route.continue({
+            url: "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=1234567890953435"
+        })
+    );
+
+
+    await page
+        .locator("button:has-text('View')")
+        .first()
+        .click();
+
+
+    await expect(
+        page.locator("p").last()
+    ).toHaveText(
+        'You are not authorize to view this order'
+    );
+
+});
+
+
+--------------------------------
+1. IMPORT
+--------------------------------
+
+import { test, expect } from "@playwright/test";
+
+
+test
+ ↓
+Used to create and execute Playwright tests.
+
+
+expect
+ ↓
+Used for assertions / validations.
+
+
+--------------------------------
+2. TEST CASE
+--------------------------------
+
+test("security test request interception", async ({ page }) => {
+
+
+This creates a Playwright test.
+
+Test name:
+
+security test request interception
+
+
+The test is checking whether the application
+properly handles an unauthorized order request.
+
+
+--------------------------------
+3. CREATE LOCATORS
+--------------------------------
+
+const userName = page.locator('#userEmail');
+
+const password = page.locator("#userPassword");
+
+const loginBtn = page.locator('#login');
+
+
+These are locators for:
+
+Username field
+     ↓
+#userEmail
+
+
+Password field
+     ↓
+#userPassword
+
+
+Login button
+     ↓
+#login
+
+
+--------------------------------
+4. EMAIL VARIABLE
+--------------------------------
+
+const email = "anshika@gmail.com";
+
+
+The email is stored in a variable.
+
+Instead of directly writing the email
+multiple times, we can use:
+
+email
+
+
+Example:
+
+await userName.fill(email);
+
+
+--------------------------------
+5. OPEN APPLICATION
+--------------------------------
+
+await page.goto(
+    "https://rahulshettyacademy.com/client"
+);
+
+
+Opens the application in the browser.
+
+
+Flow:
+
+page.goto()
+     ↓
+Open Application
+     ↓
+Login Page
+
+
+--------------------------------
+6. ENTER USERNAME
+--------------------------------
+
+await userName.fill(email);
+
+
+fill()
+
+→ Enters the email into the username
+  field.
+
+
+Flow:
+
+email variable
+      ↓
+fill()
+      ↓
+Username field
+
+
+--------------------------------
+7. ENTER PASSWORD
+--------------------------------
+
+await password.fill('Iamking@000');
+
+
+fill()
+
+→ Enters the password into the password
+  field.
+
+
+--------------------------------
+8. CLICK LOGIN
+--------------------------------
+
+await loginBtn.click();
+
+
+click()
+
+→ Clicks the Login button.
+
+
+Flow:
+
+Username
+   +
+Password
+   ↓
+Login
+   ↓
+Application
+
+
+--------------------------------
+9. waitForLoadState()
+--------------------------------
+
+await page.waitForLoadState('networkidle');
+
+
+waitForLoadState()
+
+→ Waits for the page to reach a particular
+  loading state.
+
+
+networkidle
+
+→ Waits until there are no active network
+  connections for a short period.
+
+
+In simple words:
+
+Page loading
+     ↓
+Network requests
+     ↓
+Requests finish
+     ↓
+networkidle
+     ↓
+Continue test
+
+
+--------------------------------
+10. WAIT FOR PRODUCT ELEMENT
+--------------------------------
+
+await page
+    .locator('.card-body b')
+    .first()
+    .waitFor();
+
+
+This waits for the first matching product
+element to appear.
+
+
+Breakdown:
+
+.locator('.card-body b')
+        ↓
+Find all matching elements
+
+.first()
+        ↓
+Select first element
+
+.waitFor()
+        ↓
+Wait until it is available
+
+
+Flow:
+
+Find product
+    ↓
+Select first product
+    ↓
+Wait for product
+    ↓
+Continue
+
+
+--------------------------------
+11. GO TO MY ORDERS
+--------------------------------
+
+await page
+    .locator("button[routerlink*='myorders']")
+    .click();
+
+
+Clicks the My Orders button.
+
+
+Flow:
+
+Login
+  ↓
+Products page
+  ↓
+My Orders
+  ↓
+Orders displayed
+
+
+--------------------------------
+12. MAIN CONCEPT
+--------------------------------
+
+REQUEST INTERCEPTION
+
+
+The important new concept in this test
+is:
+
+page.route()
+
+
+We use it to intercept the API request
+before it reaches the server.
+
+
+--------------------------------
+13. page.route()
+--------------------------------
+
+await page.route(
+    "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=*",
+    route => route.continue({
+        url: "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=1234567890953435"
+    })
+);
+
+
+page.route()
+
+→ Intercepts a network request.
+
+
+The request pattern is:
+
+get-orders-details?id=*
+
+
+The `*` means the order ID can be
+different.
+
+
+Example:
+
+get-orders-details?id=123
+
+get-orders-details?id=456
+
+get-orders-details?id=789
+
+
+All can match:
+
+get-orders-details?id=*
+
+
+--------------------------------
+14. WHY ARE WE INTERCEPTING?
+--------------------------------
+
+Normally:
+
+Click View
+     ↓
+Application sends request
+     ↓
+Original Order ID
+     ↓
+Server
+     ↓
+Order Details
+     ↓
+UI
+
+
+But in this test:
+
+Click View
+     ↓
+Request intercepted
+     ↓
+Order ID changed
+     ↓
+Unauthorized Order ID
+     ↓
+Server
+     ↓
+Unauthorized response
+     ↓
+UI
+
+
+This is used to test the application's
+security behavior.
+
+
+--------------------------------
+15. route
+--------------------------------
+
+route =>
+
+
+route
+
+→ Represents the intercepted network
+  request.
+
+
+Playwright gives us this route object
+so we can control the request.
+
+
+We can:
+
+→ Continue the request
+→ Change the URL
+→ Change headers
+→ Modify request information
+→ Abort the request
+→ Fulfill with a mock response
+
+
+--------------------------------
+16. route.continue()
+--------------------------------
+
+route.continue({
+    url: "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=1234567890953435"
+})
+
+
+route.continue()
+
+→ Allows the request to continue to
+  the server.
+
+
+But here we are changing the URL
+before continuing the request.
+
+
+So:
+
+Original Request
+       ↓
+Intercept
+       ↓
+Change URL
+       ↓
+Continue
+       ↓
+Server
+
+
+--------------------------------
+17. ORIGINAL REQUEST
+--------------------------------
+
+The application normally sends something
+like:
+
+get-orders-details?id=ORIGINAL_ORDER_ID
+
+
+But our route changes it to:
+
+get-orders-details?id=1234567890953435
+
+
+So the request becomes:
+
+Original Order ID
+       ↓
+Intercept
+       ↓
+Replace Order ID
+       ↓
+1234567890953435
+       ↓
+Send to Server
+
+
+--------------------------------
+18. IMPORTANT DIFFERENCE
+--------------------------------
+
+In the previous API mocking example:
+
+page.route()
+     ↓
+Intercept
+     ↓
+Fake Response
+     ↓
+route.fulfill()
+
+
+Here:
+
+page.route()
+     ↓
+Intercept
+     ↓
+Modify Request URL
+     ↓
+route.continue()
+     ↓
+Real Server
+     ↓
+Real Response
+
+
+So this test is NOT mocking the response.
+
+
+It is modifying the REQUEST.
+
+
+--------------------------------
+19. MOCKING VS REQUEST MODIFICATION
+--------------------------------
+
+API MOCKING:
+
+page.route()
+     ↓
+Intercept Request
+     ↓
+Create Fake Response
+     ↓
+route.fulfill()
+     ↓
+Browser
+
+
+REQUEST MODIFICATION:
+
+page.route()
+     ↓
+Intercept Request
+     ↓
+Modify Request
+     ↓
+route.continue()
+     ↓
+Real Server
+     ↓
+Real Response
+     ↓
+Browser
+
+
+--------------------------------
+20. CLICK VIEW
+--------------------------------
+
+await page
+    .locator("button:has-text('View')")
+    .first()
+    .click();
+
+
+This finds the first View button
+and clicks it.
+
+
+Breakdown:
+
+button:has-text('View')
+        ↓
+Find buttons containing "View"
+
+.first()
+        ↓
+Select first View button
+
+.click()
+        ↓
+Click the button
+
+
+--------------------------------
+21. WHAT HAPPENS AFTER CLICK VIEW?
+--------------------------------
+
+When View is clicked:
+
+Application
+     ↓
+Sends Get Order Details API
+     ↓
+page.route() intercepts
+     ↓
+Original Order ID is replaced
+     ↓
+New Order ID is sent
+     ↓
+Server checks the order
+     ↓
+User is not authorized
+     ↓
+Error message returned
+     ↓
+UI displays error
+
+
+--------------------------------
+22. SECURITY VALIDATION
+--------------------------------
+
+await expect(
+    page.locator("p").last()
+).toHaveText(
+    'You are not authorize to view this order'
+);
+
+
+This is the final validation.
+
+
+The test checks whether the UI displays:
+
+You are not authorize to view this order
+
+
+This verifies that the application
+does not allow the user to view an
+unauthorized order.
+
+
+--------------------------------
+23. page.locator("p").last()
+--------------------------------
+
+page.locator("p")
+
+
+Finds all <p> elements on the page.
+
+
+.last()
+
+
+Selects the last matching <p> element.
+
+
+So:
+
+page.locator("p").last()
+
+
+means:
+
+Find all paragraph elements
+       ↓
+Select the last paragraph
+
+
+--------------------------------
+24. toHaveText()
+--------------------------------
+
+.toHaveText(
+    'You are not authorize to view this order'
+);
+
+
+toHaveText()
+
+→ Checks whether the locator contains
+  the expected text.
+
+
+Expected:
+
+You are not authorize to view this order
+
+
+If text matches:
+
+PASS
+
+
+If text does not match:
+
+FAIL
+
+
+--------------------------------
+25. COMPLETE REQUEST FLOW
+--------------------------------
+
+Login
+  ↓
+Open Application
+  ↓
+Wait for Page
+  ↓
+Go to My Orders
+  ↓
+Click View
+  ↓
+Application sends
+Get Order Details API
+  ↓
+page.route() intercepts
+  ↓
+Change Order ID
+  ↓
+route.continue()
+  ↓
+Request goes to Server
+  ↓
+Server checks authorization
+  ↓
+Unauthorized response
+  ↓
+UI displays error
+  ↓
+expect()
+  ↓
+PASS
+
+
+--------------------------------
+26. SECURITY TESTING CONCEPT
+--------------------------------
+
+This test is checking whether a user
+can access an order by manipulating
+the order ID in the API request.
+
+
+The test changes the requested order ID
+to another order ID.
+
+
+Then it checks whether the application
+properly rejects the request.
+
+
+Expected behavior:
+
+Unauthorized Order
+       ↓
+Access denied
+       ↓
+Error message displayed
+
+
+--------------------------------
+27. WHY IS THIS A SECURITY TEST?
+--------------------------------
+
+The test is checking whether the backend
+properly validates authorization for the
+requested order.
+
+
+Even if the user changes the order ID,
+the server should not simply return
+another user's order details.
+
+
+Expected:
+
+User requests unauthorized order
+             ↓
+Server checks authorization
+             ↓
+Access denied
+
+
+This is an example of testing
+authorization behavior.
+
+
+--------------------------------
+28. IMPORTANT SECURITY CONCEPT
+--------------------------------
+
+The important idea is:
+
+DO NOT TRUST ONLY THE UI.
+
+
+The UI may show a View button.
+
+But the backend should still verify:
+
+→ Is this user allowed to access
+  this order?
+
+If not:
+
+→ Reject the request.
+
+
+--------------------------------
+29. COMPLETE CODE FLOW
+--------------------------------
+
+LOGIN
+  ↓
+Email + Password
+  ↓
+Login
+  ↓
+Wait for Application
+  ↓
+My Orders
+  ↓
+Click View
+  ↓
+Get Order Details API
+  ↓
+page.route()
+  ↓
+Intercept Request
+  ↓
+Change Order ID
+  ↓
+route.continue()
+  ↓
+Real Server
+  ↓
+Authorization Check
+  ↓
+Unauthorized
+  ↓
+Error Message
+  ↓
+toHaveText()
+  ↓
+PASS
+
+
+--------------------------------
+30. NEW METHODS / CONCEPTS
+--------------------------------
+
+page.route()
+
+→ Intercepts network requests.
+
+
+route
+
+→ Represents the intercepted request.
+
+
+route.continue()
+
+→ Allows the request to continue to
+  the server.
+
+
+route.continue({ url: "..." })
+
+→ Continues the request but with a
+  modified URL.
+
+
+`*`
+
+→ Wildcard used to match different
+  values in the URL.
+
+
+toHaveText()
+
+→ Validates text displayed by the UI.
+
+
+--------------------------------
+31. EASY WAY TO REMEMBER
+--------------------------------
+
+REQUEST INTERCEPTION:
+
+REQUEST
+   ↓
+INTERCEPT
+   ↓
+MODIFY
+   ↓
+CONTINUE
+   ↓
+SERVER
+   ↓
+RESPONSE
+   ↓
+UI
+
+
+For this test:
+
+page.route()
+     ↓
+Intercept
+     ↓
+Change Order ID
+     ↓
+route.continue()
+     ↓
+Server
+     ↓
+Authorization Check
+     ↓
+Unauthorized
+     ↓
+UI Error
+
+
+--------------------------------
+32. DIFFERENCE FROM PREVIOUS
+--------------------------------
+
+PREVIOUS TEST:
+
+page.route()
+     ↓
+Intercept API
+     ↓
+Fetch original response
+     ↓
+Create fake response
+     ↓
+route.fulfill()
+     ↓
+UI receives fake response
+
+
+CURRENT TEST:
+
+page.route()
+     ↓
+Intercept API
+     ↓
+Change request URL
+     ↓
+route.continue()
+     ↓
+Real server
+     ↓
+Real response
+     ↓
+UI
+
+
+MAIN DIFFERENCE:
+
+route.fulfill()
+     ↓
+Mock / Replace Response
+
+
+route.continue()
+     ↓
+Continue Request
+
+
+--------------------------------
+33. INTERVIEW ONE-LINER
+--------------------------------
+
+"I use Playwright request interception with page.route() to modify the order ID in the Get Order Details API request and continue the request to the real server. This helps validate whether the backend correctly prevents unauthorized users from accessing another order's details."
+
+
+--------------------------------
+34. KEY TAKEAWAY
+--------------------------------
+
+page.route()
+     ↓
+Intercept Request
+     ↓
+Modify URL
+     ↓
+route.continue()
+     ↓
+Real Server
+     ↓
+Authorization Validation
+     ↓
+Unauthorized Response
+     ↓
+UI Error Message
+     ↓
+Assertion
+
+
+The main concept is:
+
+page.route() + route.continue()
+
+→ Used to intercept and modify a request
+  while still allowing it to go to the
+  real server.
+
+
+--------------------------------
+END
+--------------------------------
+
+--------------------------------
+TOPIC
+--------------------------------
+
+API / NETWORK INTERCEPTION
+IN PLAYWRIGHT
+
+--------------------------------
+COMPLETE CODE
+--------------------------------
+
+import { test, expect } from '@playwright/test';
+
+
+test('Browser Context Playwright test', async ({ browser }) => {
+
+    const context = await browser.newContext();
+
+    const page = await context.newPage();
+
+
+    // Intercept and abort image requests
+    page.route(
+        "**/*.{jpg,jpeg,png}",
+        route => route.abort()
+    );
+
+
+    await page.goto(
+        "https://rahulshettyacademy.com/loginpagePractise/"
+    );
+
+
+    // Monitor outgoing requests
+    page.on(
+        'request',
+        request => console.log(request.url())
+    );
+
+
+    // Monitor incoming responses
+    page.on(
+        'response',
+        response => console.log(
+            response.url(),
+            response.status()
+        )
+    );
+
+
+});
+
+
+--------------------------------
+1. page.route()
+--------------------------------
+
+CODE:
+
+page.route(
+    "**/*.{jpg,jpeg,png}",
+    route => route.abort()
+);
+
+
+page.route()
+
+→ Used to intercept network requests
+  made by the browser.
+
+
+In this example, we are intercepting
+image requests.
+
+
+--------------------------------
+2. URL PATTERN
+--------------------------------
+
+"**/*.{jpg,jpeg,png}"
+
+
+This pattern matches image files such as:
+
+.jpg
+.jpeg
+.png
+
+
+`**/*`
+
+→ Matches files from any path/location.
+
+
+Example:
+
+image.jpg
+image.jpeg
+image.png
+
+
+--------------------------------
+3. route
+--------------------------------
+
+route =>
+
+
+`route`
+
+→ Represents the intercepted network
+  request.
+
+
+Flow:
+
+Browser
+   ↓
+Network Request
+   ↓
+page.route()
+   ↓
+Request Intercepted
+   ↓
+route
+
+
+--------------------------------
+4. route.abort()
+--------------------------------
+
+route.abort()
+
+
+→ Stops the intercepted request.
+
+
+Flow:
+
+Browser wants image
+       ↓
+page.route()
+       ↓
+Request intercepted
+       ↓
+route.abort()
+       ↓
+Request stopped
+
+
+So the image will not be loaded.
+
+
+--------------------------------
+5. page.on('request')
+--------------------------------
+
+CODE:
+
+page.on(
+    'request',
+    request => console.log(request.url())
+);
+
+
+`page.on('request')`
+
+→ Used to monitor outgoing network
+  requests.
+
+
+Whenever the browser sends a request,
+this event is triggered.
+
+
+--------------------------------
+6. request.url()
+--------------------------------
+
+request.url()
+
+
+→ Returns the URL of the request.
+
+
+Example:
+
+Browser sends:
+
+https://example.com/api/login
+
+
+Then:
+
+request.url()
+
+
+returns:
+
+https://example.com/api/login
+
+
+Flow:
+
+Browser
+   ↓
+Request
+   ↓
+request event
+   ↓
+request.url()
+   ↓
+Console
+
+
+--------------------------------
+7. page.on('response')
+--------------------------------
+
+CODE:
+
+page.on(
+    'response',
+    response => console.log(
+        response.url(),
+        response.status()
+    )
+);
+
+
+`page.on('response')`
+
+→ Used to monitor incoming responses
+  from the server.
+
+
+Whenever the browser receives a
+response, this event is triggered.
+
+
+--------------------------------
+8. response.url()
+--------------------------------
+
+response.url()
+
+
+→ Returns the URL associated with
+  the response.
+
+
+Example:
+
+https://example.com/api/login
+
+
+--------------------------------
+9. response.status()
+--------------------------------
+
+response.status()
+
+
+→ Returns the HTTP status code.
+
+
+Examples:
+
+200
+ ↓
+Success
+
+
+201
+ ↓
+Created
+
+
+400
+ ↓
+Bad Request
+
+
+401
+ ↓
+Unauthorized
+
+
+403
+ ↓
+Forbidden
+
+
+404
+ ↓
+Not Found
+
+
+500
+ ↓
+Server Error
+
+
+--------------------------------
+10. REQUEST VS RESPONSE
+--------------------------------
+
+REQUEST:
+
+Browser
+   ↓
+Server
+
+
+page.on('request')
+
+→ Monitors the request going OUT.
+
+
+RESPONSE:
+
+Server
+   ↓
+Browser
+
+
+page.on('response')
+
+→ Monitors the response coming BACK.
+
+
+Easy way to remember:
+
+REQUEST
+   ↓
+Browser → Server
+
+
+RESPONSE
+   ↓
+Server → Browser
+
+
+--------------------------------
+11. REQUEST MONITORING
+    VS REQUEST INTERCEPTION
+--------------------------------
+
+REQUEST MONITORING:
+
+page.on(
+    'request',
+    request => console.log(request.url())
+);
+
+
+Purpose:
+
+→ Observe the request.
+
+
+--------------------------------
+
+REQUEST INTERCEPTION:
+
+page.route(
+    "**/*.{jpg,jpeg,png}",
+    route => route.abort()
+);
+
+
+Purpose:
+
+→ Intercept and control the request.
+
+
+--------------------------------
+12. page.on('request')
+    VS page.route()
+--------------------------------
+
+page.on('request')
+
+→ Observe request
+
+
+page.route()
+
+→ Intercept/control request
+
+
+Easy way:
+
+ON
+ ↓
+Observe
+
+
+ROUTE
+ ↓
+Control
+
+
+--------------------------------
+13. route.abort()
+    VS route.continue()
+    VS route.fulfill()
+--------------------------------
+
+route.abort()
+
+→ Stop the request.
+
+
+route.continue()
+
+→ Allow the request to continue
+  to the server.
+
+
+route.fulfill()
+
+→ Provide a custom response.
+
+
+Flow:
+
+page.route()
+     ↓
+Intercept
+     ↓
+     ├── route.abort()
+     │       ↓
+     │    Stop
+     │
+     ├── route.continue()
+     │       ↓
+     │    Continue to server
+     │
+     └── route.fulfill()
+             ↓
+         Custom response
+
+
+--------------------------------
+14. COMPLETE NETWORK FLOW
+--------------------------------
+
+Browser
+   ↓
+Network Request
+   ↓
+page.route()
+   ↓
+Request intercepted
+   ↓
+abort / continue / fulfill
+
+
+At the same time, we can monitor:
+
+page.on('request')
+   ↓
+Observe outgoing request
+
+
+page.on('response')
+   ↓
+Observe incoming response
+
+
+--------------------------------
+15. IN THIS CODE
+--------------------------------
+
+THREE IMPORTANT NETWORK CONCEPTS:
+
+1. ABORT REQUEST
+
+page.route(
+    "**/*.{jpg,jpeg,png}",
+    route => route.abort()
+);
+
+
+2. MONITOR REQUEST
+
+page.on(
+    'request',
+    request => console.log(request.url())
+);
+
+
+3. MONITOR RESPONSE
+
+page.on(
+    'response',
+    response => console.log(
+        response.url(),
+        response.status()
+    )
+);
+
+
+--------------------------------
+16. EASY WAY TO REMEMBER
+--------------------------------
+
+REQUEST
+   ↓
+page.on('request')
+   ↓
+OBSERVE
+
+
+REQUEST
+   ↓
+page.route()
+   ↓
+INTERCEPT
+   ↓
+abort / continue / fulfill
+
+
+RESPONSE
+   ↓
+page.on('response')
+   ↓
+OBSERVE
+
+
+--------------------------------
+17. INTERVIEW ONE-LINER
+--------------------------------
+
+"In Playwright, page.on('request') and page.on('response') are used to monitor network activity, while page.route() is used to intercept and control network requests. We can abort, continue, or fulfill an intercepted request."
+
+
+--------------------------------
+18. KEY TAKEAWAY
+--------------------------------
+
+page.on('request')
+        ↓
+Monitor outgoing requests
+
+
+page.on('response')
+        ↓
+Monitor incoming responses
+
+
+page.route()
+        ↓
+Intercept requests
+
+
+route.abort()
+        ↓
+Stop request
+
+
+route.continue()
+        ↓
+Continue request
+
+
+route.fulfill()
+        ↓
+Send custom response
+
+
+--------------------------------
+END
+--------------------------------
